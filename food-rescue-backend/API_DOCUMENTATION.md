@@ -6,32 +6,29 @@ This document describes the REST API endpoints available in the Food Rescue Back
 
 Base URL: `http://localhost:8080/api`
 
+> **Update note (16 Sept 2026):** Sections marked  below have been checked directly against the current source code and manually tested. Sections marked  have NOT been re-verified since parts of this project (the dashboard/analytics layer in particular) were changed by someone other than the original author — treat those sections as possibly outdated until someone confirms them against the actual controller code.
+
 ---
 
-## User Management (`/api/users`)
+## User Management (`/api/users`)  Not yet re-verified
+
+The endpoints below are as originally documented. `UserController.java` and `UserService.java` have not been re-checked against this — if anyone edited them, this section may be stale. **Two corrections below are confirmed**, the rest is unverified.
 
 ### List All Users
 - **GET** `/api/users`
-- **Description**: Retrieve all registered users (admin only)
 - **Response**: `200 OK` - List of UserDTOs
+- ✅ Tested and working.
 
 ### Get User by ID
 - **GET** `/api/users/{id}`
-- **Description**: Retrieve a specific user by ID
-- **Parameters**: 
-  - `id` (path, required): User ID
 - **Response**: `200 OK` - UserDTO or `404 Not Found`
 
 ### Get User by Email
 - **GET** `/api/users/email/{email}`
-- **Description**: Retrieve a user by their email address
-- **Parameters**:
-  - `email` (path, required): User email
 - **Response**: `200 OK` - UserDTO or `404 Not Found`
 
 ### Create User
 - **POST** `/api/users`
-- **Description**: Create a new user account
 - **Request Body**:
   ```json
   {
@@ -45,12 +42,10 @@ Base URL: `http://localhost:8080/api`
   }
   ```
 - **Response**: `201 Created` - Created UserDTO or `400 Bad Request`
+- ✅ Tested and working. Note: `verificationStatus` is `null` for `DONOR` and `ADMIN` roles, and defaults to `"PENDING"` automatically for `RECIPIENT_ORG` — you don't set it on creation.
 
 ### Update User
 - **PUT** `/api/users/{id}`
-- **Description**: Update an existing user's information
-- **Parameters**:
-  - `id` (path, required): User ID
 - **Request Body**:
   ```json
   {
@@ -58,218 +53,170 @@ Base URL: `http://localhost:8080/api`
     "organisationName": "Updated Org",
     "phoneNumber": "08 9876 5432",
     "address": "456 New St",
-    "verificationStatus": "VERIFIED"
+    "verificationStatus": "APPROVED"
   }
   ```
 - **Response**: `200 OK` - Updated UserDTO or `404 Not Found`
+- ✅ **Corrected**: the value is `"APPROVED"`, not `"VERIFIED"` as the doc previously said. `ReservationService` explicitly checks for `VerificationStatus.APPROVED` — using `"VERIFIED"` will silently fail to unlock reservation ability for a recipient org.
 
 ### Delete User
 - **DELETE** `/api/users/{id}`
-- **Description**: Delete a user account
-- **Parameters**:
-  - `id` (path, required): User ID
 - **Response**: `204 No Content` or `404 Not Found`
 
 ### Get Pending Verifications
 - **GET** `/api/users/pending-verifications`
-- **Description**: Retrieve all recipient organizations awaiting verification
 - **Response**: `200 OK` - List of UserDTOs with PENDING status
 
 ---
 
-## Donation Management (`/api/donations`)
+## Donation Management (`/api/donations`) Verified against source + tested
 
 ### List All Donations
 - **GET** `/api/donations`
-- **Description**: Retrieve all donations
 - **Response**: `200 OK` - List of DonationDTOs
 
 ### Get Donation by ID
 - **GET** `/api/donations/{id}`
-- **Description**: Retrieve a specific donation
-- **Parameters**:
-  - `id` (path, required): Donation ID
 - **Response**: `200 OK` - DonationDTO or `404 Not Found`
 
 ### Get Available Donations
 - **GET** `/api/donations/available`
-- **Description**: Browse available donations (for recipient organizations)
 - **Response**: `200 OK` - List of available DonationDTOs
+- ✅ Tested and working.
 
 ### Get Donor's Donations
 - **GET** `/api/donations/donor/{donorId}`
-- **Description**: Retrieve all donations from a specific donor
-- **Parameters**:
-  - `donorId` (path, required): Donor user ID
 - **Response**: `200 OK` - List of DonationDTOs or `404 Not Found`
 
 ### Create Donation
 - **POST** `/api/donations`
-- **Description**: Create a new food donation
-- **Query Parameters**:
-  - `donorId` (required): ID of the donor creating the donation
+- **Query Parameters**: `donorId` (required)
 - **Request Body**:
   ```json
   {
-    "title": "Fresh Vegetables",
-    "description": "Surplus vegetables from today's stock",
-    "category": "VEGETABLES",
-    "quantity": 50,
+    "title": "Fresh Bread",
+    "description": "Surplus loaves from today's stock",
+    "category": "BAKERY",
+    "quantity": 5,
     "quantityUnit": "kg",
-    "dietaryInfo": "Organic, pesticide-free",
-    "storageInfo": "Keep refrigerated below 5°C",
-    "expiryDateTime": "2026-08-15T18:00:00Z",
-    "collectionDeadline": "2026-08-15T17:00:00Z",
+    "dietaryInfo": "Contains gluten",
+    "storageInfo": "Store at room temperature",
+    "expiryDateTime": "2026-12-31T18:00:00Z",
+    "collectionDeadline": "2026-12-31T17:00:00Z",
     "pickupAddress": "123 Market St, Adelaide"
   }
   ```
 - **Response**: `201 Created` - Created DonationDTO or `400 Bad Request`
+- ✅ Tested and working.
+- **Corrected `category` values** — the previous doc used `"VEGETABLES"`, which is not a valid value and will cause a `400`. The actual valid values are:
+  `FRESH_PRODUCE`, `BAKERY`, `DAIRY`, `MEAT_AND_SEAFOOD`, `PANTRY_AND_DRY_GOODS`, `PREPARED_MEALS`, `BEVERAGES`, `OTHER`
 
 ### Get Donations by Status
 - **GET** `/api/donations/status/{status}`
-- **Description**: Retrieve donations filtered by status
-- **Parameters**:
-  - `status` (path, required): One of AVAILABLE, RESERVED, COLLECTED, EXPIRED, CANCELLED
+- **Parameters**: `status` — one of `AVAILABLE`, `RESERVED`, `COLLECTED`, `EXPIRED`, `CANCELLED`
 - **Response**: `200 OK` - List of DonationDTOs
 
 ### Update Donation Status
 - **PATCH** `/api/donations/{id}/status`
-- **Description**: Change donation status
-- **Parameters**:
-  - `id` (path, required): Donation ID
-  - `status` (query, required): New status
+- **Parameters**: `status` (query, required)
 - **Response**: `200 OK` - Updated DonationDTO or `404 Not Found`
 
 ### Delete Donation
 - **DELETE** `/api/donations/{id}`
-- **Description**: Delete/cancel a donation
-- **Parameters**:
-  - `id` (path, required): Donation ID
 - **Response**: `204 No Content` or `404 Not Found`
 
 ---
 
-## Reservation Management (`/api/reservations`)
+## Reservation Management (`/api/reservations`) Verified against source + tested
 
 ### List All Reservations
 - **GET** `/api/reservations`
-- **Description**: Retrieve all reservations
 - **Response**: `200 OK` - List of ReservationDTOs
 
 ### Get Reservation by ID
 - **GET** `/api/reservations/{id}`
-- **Description**: Retrieve a specific reservation
-- **Parameters**:
-  - `id` (path, required): Reservation ID
 - **Response**: `200 OK` - ReservationDTO or `404 Not Found`
 
 ### Get Recipient Organization's Reservations
 - **GET** `/api/reservations/recipient/{recipientOrgId}`
-- **Description**: Retrieve all reservations for a recipient organization
-- **Parameters**:
-  - `recipientOrgId` (path, required): Recipient organization user ID
 - **Response**: `200 OK` - List of ReservationDTOs or `404 Not Found`
 
 ### Create Reservation
 - **POST** `/api/reservations`
-- **Description**: Create a new reservation for a donation
-- **Query Parameters**:
-  - `recipientOrgId` (required): ID of the recipient organization
+- **Query Parameters**: `recipientOrgId` (required)
 - **Request Body**:
   ```json
   {
     "donationId": 1,
-    "scheduledPickupTime": "2026-08-15T16:30:00Z"
+    "scheduledPickupTime": "2026-12-31T16:00:00Z"
   }
   ```
 - **Response**: `201 Created` - Created ReservationDTO or `400 Bad Request`
+- ✅ Tested and working. Business rules enforced in `ReservationService` (confirmed by reading the source):
+  - The `recipientOrgId` must belong to a user with role `RECIPIENT_ORG`
+  - That user's `verificationStatus` must be `APPROVED`
+  - The target donation's status must be `AVAILABLE`
+  - The donation must not already have an active reservation
+  - On success, the donation's status is automatically flipped to `RESERVED` (same transaction — both succeed or both roll back together)
 
 ### Get Reservations by Status
 - **GET** `/api/reservations/status/{status}`
-- **Description**: Retrieve reservations filtered by status
-- **Parameters**:
-  - `status` (path, required): One of PENDING, CONFIRMED, COLLECTED, CANCELLED
+- **Parameters**: `status` — one of `PENDING`, `CONFIRMED`, `COLLECTED`, `CANCELLED`
 - **Response**: `200 OK` - List of ReservationDTOs
 
 ### Update Reservation Status
 - **PATCH** `/api/reservations/{id}/status`
-- **Description**: Change reservation status
-- **Parameters**:
-  - `id` (path, required): Reservation ID
-  - `status` (query, required): New status
 - **Response**: `200 OK` - Updated ReservationDTO or `404 Not Found`
+- Confirmed in source: setting status to `COLLECTED` also marks the linked donation `COLLECTED` and records `collectedAt`. Setting status to `CANCELLED` also reverts the donation back to `AVAILABLE`.
 
 ### Cancel Reservation
 - **DELETE** `/api/reservations/{id}`
-- **Description**: Cancel a reservation
-- **Parameters**:
-  - `id` (path, required): Reservation ID
 - **Response**: `204 No Content` or `404 Not Found`
+- Confirmed in source: also reverts the linked donation's status back to `AVAILABLE`.
 
 ---
 
-## Notification Management (`/api/notifications`)
+## Notification Management (`/api/notifications`)  Not yet re-verified
+
+`NotificationController.java` has not been checked against this documentation — endpoints below are as originally documented and unconfirmed.
 
 ### Get User Notifications
 - **GET** `/api/notifications/user/{userId}`
-- **Description**: Retrieve all notifications for a user
-- **Parameters**:
-  - `userId` (path, required): User ID
-- **Response**: `200 OK` - List of NotificationDTOs or `404 Not Found`
 
 ### Get Unread Notifications
 - **GET** `/api/notifications/user/{userId}/unread`
-- **Description**: Retrieve unread notifications for a user
-- **Parameters**:
-  - `userId` (path, required): User ID
-- **Response**: `200 OK` - List of unread NotificationDTOs or `404 Not Found`
 
 ### Get Notification by ID
 - **GET** `/api/notifications/{id}`
-- **Description**: Retrieve a specific notification
-- **Parameters**:
-  - `id` (path, required): Notification ID
-- **Response**: `200 OK` - NotificationDTO or `404 Not Found`
 
 ### Create Notification
 - **POST** `/api/notifications`
-- **Description**: Create a new notification (system/admin only)
-- **Query Parameters**:
-  - `recipientId` (required): ID of recipient user
-  - `type` (required): One of NEW_DONATION_AVAILABLE, RESERVATION_CONFIRMED, DONATION_EXPIRING_SOON, DONATION_COLLECTED, RECIPIENT_ORG_VERIFIED
-  - `message` (required): Notification message text
-  - `relatedDonationId` (optional): Related donation ID if applicable
-- **Response**: `201 Created` - Created NotificationDTO or `400 Bad Request`
+- **Query Parameters**: `recipientId`, `type`, `message`, `relatedDonationId` (optional)
+- **Valid `type` values** (unverified — confirm against current `Notification` model): `NEW_DONATION_AVAILABLE`, `RESERVATION_CONFIRMED`, `DONATION_EXPIRING_SOON`, `DONATION_COLLECTED`, `RECIPIENT_ORG_VERIFIED`
 
 ### Mark Notification as Read
 - **PATCH** `/api/notifications/{id}/read`
-- **Description**: Mark a single notification as read
-- **Parameters**:
-  - `id` (path, required): Notification ID
-- **Response**: `200 OK` - Updated NotificationDTO or `404 Not Found`
 
 ### Mark All as Read
 - **PATCH** `/api/notifications/user/{userId}/read-all`
-- **Description**: Mark all notifications as read for a user
-- **Parameters**:
-  - `userId` (path, required): User ID
-- **Response**: `204 No Content` or `404 Not Found`
 
 ### Delete Notification
 - **DELETE** `/api/notifications/{id}`
-- **Description**: Delete a notification
-- **Parameters**:
-  - `id` (path, required): Notification ID
-- **Response**: `204 No Content` or `404 Not Found`
 
 ---
 
-## Dashboard & Analytics (`/api/dashboard`)
+## Dashboard & Analytics  Likely outdated — needs confirmation
+
+**This section is probably wrong.** We've confirmed that `DashboardService.java` was replaced by a new `AnalyticsService.java` (with a different, Lombok-based `DashboardStatsDTO`) at some point after this doc was originally written, by someone other than the original author. The endpoint path, response shape, and even whether it's still under `/api/dashboard` or has moved (e.g. `/api/analytics`) are all unconfirmed.
+
+**Action needed:** whoever wrote `AnalyticsService`/`AnalyticsController` should update this section with the real current endpoint(s) and response shape. Do not rely on the example below until someone confirms it:
+
+<details>
+<summary>Original (possibly stale) documentation — click to expand</summary>
 
 ### Get Overall Dashboard Statistics
 - **GET** `/api/dashboard/stats`
-- **Description**: Retrieve comprehensive platform statistics
-- **Response**: `200 OK` - DashboardStatsDTO
+- **Response**: `200 OK`
   ```json
   {
     "totalDonations": 45,
@@ -279,53 +226,48 @@ Base URL: `http://localhost:8080/api`
     "totalUsers": 20,
     "verifiedRecipients": 8,
     "pendingVerifications": 2,
-    "donationsByStatus": {
-      "AVAILABLE": 12,
-      "RESERVED": 5,
-      "COLLECTED": 25,
-      "EXPIRED": 2,
-      "CANCELLED": 1
-    },
-    "donationsByCategory": {
-      "VEGETABLES": 15,
-      "BAKERY": 8,
-      "FRUIT": 12,
-      "PREPARED_MEALS": 10
-    },
+    "donationsByStatus": { "AVAILABLE": 12, "RESERVED": 5, "COLLECTED": 25, "EXPIRED": 2, "CANCELLED": 1 },
+    "donationsByCategory": { "VEGETABLES": 15, "BAKERY": 8, "FRUIT": 12, "PREPARED_MEALS": 10 },
     "unreadNotifications": 5
   }
   ```
+  Note: `donationsByCategory` example above uses the old, incorrect category names — see the corrected list in the Donation Management section.
 
 ### Get User-Specific Statistics
 - **GET** `/api/dashboard/user/{userId}/stats`
-- **Description**: Retrieve statistics for a specific user
-- **Parameters**:
-  - `userId` (path, required): User ID
-- **Response**: `200 OK` - User statistics object or `404 Not Found`
-  - For DONOR users: totalDonations, donationsByStatus, totalQuantityDonated, unreadNotifications
-  - For RECIPIENT_ORG users: totalReservations, reservationsByStatus, completedReservations, totalQuantityReceived, unreadNotifications
+
+</details>
 
 ---
 
-## Error Responses
+## Error Responses  Corrected based on actual tested behavior
 
-All endpoints return standard error responses on failure:
+**This section was previously inaccurate.** The API does **not** consistently return a JSON error body — the actual behavior depends on where the error occurs, confirmed by manual testing:
 
+### Validation errors (e.g. missing required field, caught by `@Valid`)
+These ARE caught by `GlobalExceptionHandler` and return a proper JSON body:
 ```json
 {
   "status": 400,
-  "message": "Bad Request",
-  "error": "Detailed error message",
-  "timestamp": "2026-08-13T12:34:56.789Z",
+  "message": "Validation failed",
+  "error": "title: Title is required",
   "path": "/api/donations"
 }
 ```
 
-### Common Status Codes:
+### Business-rule errors (e.g. donor not found, donation already reserved, recipient not approved)
+These are currently caught **locally inside the controller** (`DonationController` and `ReservationController` both do this) and return an **empty body** with no explanation:
+```
+HTTP/1.1 400 Bad Request
+Content-Length: 0
+```
+This is a known gap — worth fixing so these errors go through `GlobalExceptionHandler` too instead of being swallowed locally. Until fixed, don't rely on the response body to explain *why* a `400` happened for these cases — check the server logs instead, or rely on knowing the business rules listed above.
+
+### Common Status Codes
 - `200 OK` - Successful retrieval
 - `201 Created` - Successful creation
 - `204 No Content` - Successful deletion/update with no content
-- `400 Bad Request` - Invalid input or business logic violation
+- `400 Bad Request` - Invalid input or business logic violation (see note above on inconsistent error bodies)
 - `404 Not Found` - Resource not found
 - `500 Internal Server Error` - Server error
 
@@ -333,7 +275,7 @@ All endpoints return standard error responses on failure:
 
 ## Authentication & Authorization
 
-Currently, the API does not enforce authentication. Production deployment should implement:
+Currently, the API does not enforce authentication — confirmed in `SecurityConfig.java` (`.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())`). A `PasswordEncoder` (BCrypt) bean is already wired in for when JWT auth is added later. Production deployment should implement:
 - JWT token-based authentication
 - Role-based access control (RBAC) using Spring Security
 - Endpoint restrictions by role (e.g., admin-only operations)
@@ -353,3 +295,7 @@ H2 console: `http://localhost:8080/h2-console`
 - JDBC URL: `jdbc:h2:mem:foodrescue`
 - Username: `sa`
 - Password: (leave empty)
+
+---
+
+*Last verified: 16 Sept 2026, by Anil, against `DonationController`, `DonationService`, `ReservationController`, `ReservationService`, `FoodCategory`, `SecurityConfig`, and `GlobalExceptionHandler`. User, Notification, and Dashboard/Analytics sections still need someone to re-check them against current source.*
