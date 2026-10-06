@@ -61,6 +61,14 @@ public class GlobalExceptionHandler {
                 request);
     }
 
+    /** Failed login attempts. */
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(
+            UnauthorizedException ex, WebRequest request) {
+
+        return build(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), request);
+    }
+
     /**
      * Services throw a plain RuntimeException(message) for deliberate failures,
      * such as "Donation not found" or "Recipient organisation must be approved".
