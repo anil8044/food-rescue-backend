@@ -4,9 +4,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.stream.Collectors;
 
@@ -17,89 +19,86 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle validation errors (e.g., @Valid failures).
-     */
+    /** Validation errors (@Valid failures). */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex,
-            WebRequest request) {
+            MethodArgumentNotValidException ex, WebRequest request) {
 
-        String message = ex.getBindingResult().getFieldErrors().stream()
+        String detail = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation failed",
-                message
-        );
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return build(HttpStatus.BAD_REQUEST, "Validation failed", detail, request);
     }
 
-    /**
-     * Handle unreadable request bodies, such as malformed JSON or an invalid
-     * enum value (e.g. an unknown severity or category).
-     */
+    /** Malformed JSON or an invalid enum value inside a request body. */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleUnreadableBody(
-            HttpMessageNotReadableException ex,
-            WebRequest request) {
+            HttpMessageNotReadableException ex, WebRequest request) {
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Invalid request body",
-                "The request body is malformed or contains an invalid value, such as an unknown severity or category."
-        );
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        return build(HttpStatus.BAD_REQUEST, "Invalid request body",
+                "The request body is malformed or contains an invalid value, such as an unknown severity or category.",
+                request);
+    }
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    /** An invalid value in a URL path or query parameter (e.g. an unknown status). */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex, WebRequest request) {
+
+        return build(HttpStatus.BAD_REQUEST, "Invalid parameter",
+                "Invalid value '" + ex.getValue() + "' for parameter '" + ex.getName() + "'.",
+                request);
+    }
+
+    /** A required query parameter was not supplied (e.g. donorId). */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParameter(
+            MissingServletRequestParameterException ex, WebRequest request) {
+
+        return build(HttpStatus.BAD_REQUEST, "Missing parameter",
+                "Required parameter '" + ex.getParameterName() + "' is missing.",
+                request);
     }
 
     /**
-     * Handle generic runtime exceptions (e.g., resource not found).
+     * Services throw a plain RuntimeException(message) for deliberate failures,
+     * such as "Donation not found" or "Recipient organisation must be approved".
+     * Those become 404 (if the message says "not found") or 400 with the message.
+     * Any more specific RuntimeException (NullPointerException etc.) is an
+     * unexpected bug and stays a 500.
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(
-            RuntimeException ex,
-            WebRequest request) {
+            RuntimeException ex, WebRequest request) {
 
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String message = ex.getMessage();
 
-        if (message != null && message.contains("not found")) {
-            status = HttpStatus.NOT_FOUND;
-        } else if (message != null && (message.contains("already exists") || message.contains("not available"))) {
-            status = HttpStatus.BAD_REQUEST;
+        if (ex.getClass().equals(RuntimeException.class) && message != null) {
+            HttpStatus status = message.contains("not found")
+                    ? HttpStatus.NOT_FOUND
+                    : HttpStatus.BAD_REQUEST;
+            return build(status, status.getReasonPhrase(), message, request);
         }
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                status.value(),
-                status.getReasonPhrase(),
-                message
-        );
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-
-        return new ResponseEntity<>(errorResponse, status);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), message, request);
     }
 
-    /**
-     * Handle all other exceptions.
-     */
+    /** Everything else. */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
-            Exception ex,
-            WebRequest request) {
+            Exception ex, WebRequest request) {
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal server error",
-                ex.getMessage()
-        );
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error",
+                ex.getMessage(), request);
+    }
+
+    private ResponseEntity<ErrorResponse> build(
+            HttpStatus status, String message, String detail, WebRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), message, detail);
         errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponse, status);
     }
 }
