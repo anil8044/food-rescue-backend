@@ -104,10 +104,13 @@ public class ReservationService {
                             + donation.getStatus());
         }
 
-        // Check if THIS SPECIFIC donation already has a reservation
-        if (reservationRepository.findByDonation(donation).isPresent()) {
+        // A donation can only have one ACTIVE reservation at a time.
+        // Cancelled reservations don't block a new one.
+        if (reservationRepository
+                .findFirstByDonationAndStatusNot(donation, ReservationStatus.CANCELLED)
+                .isPresent()) {
             throw new RuntimeException(
-                    "Donation already has an existing reservation");
+                    "Donation already has an active reservation");
         }
 
         // Create reservation

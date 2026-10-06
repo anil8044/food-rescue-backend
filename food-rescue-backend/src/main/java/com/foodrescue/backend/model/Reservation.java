@@ -10,8 +10,10 @@ import java.time.Instant;
 
 /**
  * Represents a recipient organisation's reservation of a donation, including
- * the scheduled pickup time. One donation has at most one active reservation
- * at a time (enforced in the service layer, not just the database).
+ * the scheduled pickup time. A donation can have several reservation rows over
+ * time (for example a cancelled one, then a new one), but only one active
+ * (non-cancelled) reservation at a time. That rule is enforced in
+ * ReservationService, not by a database constraint.
  */
 @Entity
 @Table(name = "reservation")
@@ -25,8 +27,8 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "donation_id", nullable = false, unique = true)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "donation_id", nullable = false)
     private Donation donation;
 
     @ManyToOne(optional = false)

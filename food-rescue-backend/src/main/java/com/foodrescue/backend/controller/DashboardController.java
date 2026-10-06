@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * REST controller for dashboard and analytics endpoints.
+ * Errors are handled centrally by GlobalExceptionHandler.
  */
 @RestController
 @RequestMapping("/api/dashboard")
@@ -23,8 +24,7 @@ public class DashboardController {
      */
     @GetMapping("/stats")
     public ResponseEntity<DashboardStatsDTO> getDashboardStats() {
-        DashboardStatsDTO stats = analyticsService.getDashboardStats();
-        return ResponseEntity.ok(stats);
+        return ResponseEntity.ok(analyticsService.getDashboardStats());
     }
 
     /**
@@ -32,11 +32,6 @@ public class DashboardController {
      */
     @GetMapping("/user/{userId}/stats")
     public ResponseEntity<Map<String, Object>> getUserStats(@PathVariable Long userId) {
-        try {
-            Map<String, Object> stats = analyticsService.getUserStats(userId);
-            return ResponseEntity.ok(stats);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(analyticsService.getUserStats(userId));
     }
 }

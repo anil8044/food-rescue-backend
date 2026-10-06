@@ -11,7 +11,18 @@ import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
+    /**
+     * Only safe while a donation has at most one reservation row. Once a donation
+     * can have several (for example a cancelled one plus a new one), this throws
+     * an error, so use findFirstByDonationAndStatusNot instead.
+     */
     Optional<Reservation> findByDonation(Donation donation);
+
+    /**
+     * Finds a reservation on this donation whose status is NOT the one given.
+     * Called with CANCELLED to ask "does this donation have an active reservation?"
+     */
+    Optional<Reservation> findFirstByDonationAndStatusNot(Donation donation, ReservationStatus status);
 
     /** A recipient organisation's reservation history. */
     List<Reservation> findByRecipientOrgOrderByReservedAtDesc(User recipientOrg);
