@@ -1,4 +1,3 @@
-
 package com.foodrescue.backend.service;
 
 import com.foodrescue.backend.dto.DashboardStatsDTO;
@@ -25,6 +24,7 @@ public class AnalyticsService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final DonationIncidentRepository incidentRepository;
 
     /**
      * Get comprehensive dashboard statistics.
@@ -80,6 +80,29 @@ public class AnalyticsService {
         stats.setUnreadNotifications(
                 notificationRepository.countByIsReadFalse()
         );
+
+        // Incident statistics (food-safety flags raised by recipient organisations)
+        List<DonationIncident> allIncidents = incidentRepository.findAll();
+        stats.setTotalIncidents(allIncidents.size());
+
+        long unresolvedIncidents = allIncidents.stream()
+                .filter(i -> i.getStatus() != IncidentStatus.RESOLVED)
+                .count();
+        stats.setUnresolvedIncidents(unresolvedIncidents);
+
+        Map<String, Long> incidentsByStatus = allIncidents.stream()
+                .collect(Collectors.groupingBy(
+                        i -> i.getStatus().name(),
+                        Collectors.counting()
+                ));
+        stats.setIncidentsByStatus(incidentsByStatus);
+
+        Map<String, Long> incidentsBySeverity = allIncidents.stream()
+                .collect(Collectors.groupingBy(
+                        i -> i.getSeverity().name(),
+                        Collectors.counting()
+                ));
+        stats.setIncidentsBySeverity(incidentsBySeverity);
 
         return stats;
     }

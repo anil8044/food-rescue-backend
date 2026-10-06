@@ -27,4 +27,10 @@ public class DashboardStatsDTO {
     private Map<DonationStatus, Long> donationsByStatus;
     private Map<String, Long> donationsByCategory;
     private long unreadNotifications;
+
+    // Food-safety incident statistics
+    private long totalIncidents;
+    private long unresolvedIncidents;
+    private Map<String, Long> incidentsByStatus;
+    private Map<String, Long> incidentsBySeverity;
 }
