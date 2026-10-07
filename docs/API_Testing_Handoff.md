@@ -36,6 +36,19 @@ A 43-request file was run in order against a fresh database. Ids in later reques
 
 Errors from every controller now return a JSON body with an `error` field that explains the problem. Assert on it in your tests, with one caveat: for the user, notification and dashboard endpoints only the status codes were recorded, so check the wording yourself.
 
+### Login and incident donor fields (Anil, 6 Oct 2026)
+
+| Test | Expected | Result |
+|---|---|---|
+| Log in as the donor with the correct password | 200; role `DONOR`; no password or hash in the body | Pass |
+| Log in with a wrong password | 401, "Invalid email or password" | Pass |
+| Log in with an unknown email | 401, same message as above | Pass |
+| Log in as the recipient org | 200; role `RECIPIENT_ORG` | Pass (status recorded) |
+| Log in with a blank email and password | 400 | Pass (status recorded) |
+| `GET /api/incidents` after flagging an incident | Each incident includes `donorId`, `donorName`, `donorOrganisation` | Pass (body checked) |
+
+After the donor-fields change, re-run blocks 12 to 18 of the 43-request file (incident lists, resolve, report). Their results haven't been reported yet.
+
 ### Still to run
 
 **Quick confirmations**
@@ -43,6 +56,11 @@ Errors from every controller now return a JSON body with an `error` field that e
 - [ ] Send block 43 a second time: expect `400` with "Donation already has an active reservation"
 - [ ] `GET /api/reservations`: reservation 2 `CANCELLED`, reservation 3 `PENDING`, both on donation 2
 - [ ] `GET /api/donations/2`: status `RESERVED`
+
+**Login**
+- [ ] Log in as an `ADMIN` (create one with `POST /api/users`, role `ADMIN`) and check the role comes back
+- [ ] Log in with spaces around the email, and with different capitalisation (record what happens)
+- [ ] Register through `POST /api/users` with role `ADMIN` (currently allowed; see known issues)
 
 **Users and notifications (untested success paths)**
 - [ ] `GET /users/{id}` and `GET /users/email/{email}` for an existing user
@@ -68,9 +86,9 @@ Errors from every controller now return a JSON body with an `error` field that e
 
 ### Known issues
 
-1. **No authentication.** Anyone can call any endpoint as any user.
+1. **No real authentication.** Login checks the password but there is no token, so anyone can call any endpoint as any user.
 2. **Incident flagging is loose.** There is no check that the flagging org collected that donation or is approved.
-3. **Incidents don't include the donor.** Get it through `GET /donations/{donationId}`.
+3. **Anyone can register as `ADMIN`.** `POST /api/users` accepts any role, so the registration screen must only offer Donor and Recipient organisation.
 4. **Notifications aren't created automatically** by donations, reservations or incidents.
 5. **Test data disappears on restart.**
 
@@ -82,7 +100,7 @@ Keep a defect log with screenshots and the request and response for every failin
 
 ### Setup
 - The backend runs on `http://localhost:8080`. CORS allows `http://localhost:3000` and `http://localhost:5173`.
-- There is no login yet. Pass the user id in the URL where an endpoint asks for it.
+- Log in with `POST /api/auth/login` (body `{"email": "...", "password": "..."}`). It returns the user, including `id` and `role`, or `401` with "Invalid email or password". There is no token, so keep the returned user in the app and pass its id where an endpoint asks for it.
 - On any failed request, show the `error` field from the response body. The text is written for users.
 - Timestamps are ISO-8601 instants.
 
@@ -126,7 +144,7 @@ Keep a defect log with screenshots and the request and response for every failin
 - A new recipient org starts as `PENDING` and **can't reserve** until approved. For testing, approve it with the `PUT` call above.
 - A reserved donation disappears from `/api/donations/available`. Refresh the list after a reservation.
 - Cancelling a reservation puts the donation back in the available list, and it can then be reserved again.
-- The incident response shows `donationId` and `donationTitle`. For the donor name, fetch `GET /api/donations/{donationId}`.
+- Each incident includes `donorId`, `donorName` and `donorOrganisation`, so the admin incident list needs no extra lookup.
 - Only users with role `RECIPIENT_ORG` can flag an incident. Show the "Flag a problem" button only to recipient orgs.
 
 ---

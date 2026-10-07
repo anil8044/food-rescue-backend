@@ -1,0 +1,5 @@
+.vscode/
+test.http
+node_modules/
+dist/
+.env

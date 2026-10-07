@@ -4,10 +4,10 @@ Base URL (local dev): `http://localhost:8080/api`
 All request bodies are JSON (`Content-Type: application/json`).
 
 **Status key**
--  Tested by hand on 6 Oct 2026
--  Implemented, but not tested individually
+- ✅ Tested by hand on 6 Oct 2026
+- ◻️ Implemented, but not tested individually
 
-All six controllers (users, donations, reservations, incidents, notifications, dashboard) were reviewed on 6 Oct 2026. `UserService` and `NotificationService` were not reviewed, so their exact error wording is unconfirmed.
+All seven controllers (auth, users, donations, reservations, incidents, notifications, dashboard) were reviewed on 6 Oct 2026, along with `UserService`, `AuthService` and the donation, reservation, incident and analytics services. `NotificationService` was not reviewed, so its exact error wording is unconfirmed.
 
 ---
 
@@ -28,7 +28,7 @@ Dates and times are ISO-8601 instants, for example `2026-12-31T18:00:00Z`.
 
 ---
 
-## Error responses 
+## Error responses ✅
 
 Every controller now passes errors to one central handler, so all endpoints return the same JSON shape:
 
@@ -51,12 +51,46 @@ Every controller now passes errors to one central handler, so all endpoints retu
 | Invalid value in the URL (e.g. `/donations/status/FOO`) | 400 | `Invalid value 'FOO' for parameter 'status'.` |
 | Required query parameter missing | 400 | `Required parameter 'donorId' is missing.` |
 | Business rule broken | 400 | `Recipient organisation must be approved before making reservations` |
+| Wrong email or password at login | 401 | `Invalid email or password` |
 | Record not found | 404 | `Donation not found with ID: 999` |
 | Unexpected server error | 500 | varies |
 
-Business-rule errors that were checked: reserving as an unapproved recipient, a donor flagging an incident, a duplicate email on user creation, a malformed incident-report date. Not-found checks: unknown donation, incident, user, notification list and dashboard user, all returning `404`. For the user, notification and dashboard cases only the status code was recorded, so don't depend on their exact wording.
+Business-rule errors that were checked: reserving as an unapproved recipient, a donor flagging an incident, a duplicate email on user creation, a malformed incident-report date. Not-found checks: unknown donation, incident, user, notification list and dashboard user, all returning `404`. For the user, notification and dashboard cases only the status code was recorded in testing. From the `UserService` source, a duplicate email says `Email already exists: <email>` and an unknown user says `User not found with ID: <id>` (or `... with email: <email>`).
 
 **How 404 is chosen:** a plain error message containing "not found" becomes `404`. Any other deliberate error becomes `400`.
+
+---
+
+## Login (`/api/auth`) ✅
+
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/api/auth/login` | Check an email and password and return the user |
+
+**Request**
+```json
+{
+  "email": "donor@test.com",
+  "password": "password123"
+}
+```
+Returns `200` with the user, including the role the frontend needs to show the right screens. The password hash is never returned:
+```json
+{
+  "id": 1,
+  "fullName": "Test Donor",
+  "email": "donor@test.com",
+  "role": "DONOR",
+  "organisationName": "Test Cafe",
+  "phoneNumber": null,
+  "address": null,
+  "verificationStatus": null,
+  "createdAt": "2026-10-06T08:57:37.906630Z"
+}
+```
+- A wrong password and an unknown email both return `401` with the same text, `Invalid email or password`, so the response doesn't reveal which accounts exist.
+- A blank email or password returns `400` with a validation message.
+- **There is no token.** The frontend keeps the returned user and sends the user id where an endpoint asks for it. This is a stop-gap for the project, not real security (see Known limitations).
 
 ---
 
@@ -64,11 +98,11 @@ Business-rule errors that were checked: reserving as an unapproved recipient, a 
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/api/users` |  List all users |
-| GET | `/api/users/{id}` |  `404` for an unknown id, `400` for a non-numeric id. Success path ◻️ |
+| GET | `/api/users` | ✅ List all users |
+| GET | `/api/users/{id}` | ✅ `404` for an unknown id, `400` for a non-numeric id. Success path ◻️ |
 | GET | `/api/users/email/{email}` | ◻️ |
-| POST | `/api/users` |  Create a user. A duplicate email returns `400` |
-| PUT | `/api/users/{id}` |  Update a user, including verification |
+| POST | `/api/users` | ✅ Create a user. A duplicate email returns `400` |
+| PUT | `/api/users/{id}` | ✅ Update a user, including verification |
 | DELETE | `/api/users/{id}` | ◻️ |
 | GET | `/api/users/pending-verifications` | ◻️ |
 
@@ -84,7 +118,7 @@ Business-rule errors that were checked: reserving as an unapproved recipient, a 
   "address": "123 Main St"
 }
 ```
-Returns `201`. `verificationStatus` is `null` for donors and admins and starts as `PENDING` for `RECIPIENT_ORG`.
+Returns `201`. `verificationStatus` is `null` for donors and admins and starts as `PENDING` for `RECIPIENT_ORG`. A duplicate email returns `400`. The API accepts any `role`, including `ADMIN`, so the registration screen should only offer Donor and Recipient organisation.
 
 **Approve a recipient organisation** (required before it can reserve anything)
 ```
@@ -95,7 +129,7 @@ The value is `APPROVED`. `VERIFIED` is not valid.
 
 ---
 
-## Donations (`/api/donations`) 
+## Donations (`/api/donations`) ✅
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -127,7 +161,7 @@ Required: `title`, `category`, `quantity` (positive), `quantityUnit`, `expiryDat
 
 ---
 
-## Reservations (`/api/reservations`) 
+## Reservations (`/api/reservations`) ✅
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -158,11 +192,11 @@ On success the donation's status becomes `RESERVED`.
 - Setting a reservation to `COLLECTED` sets the donation to `COLLECTED` and records `collectedAt`.
 - Setting it to `CANCELLED`, or calling DELETE, sets the donation back to `AVAILABLE`.
 
-**Re-reserving after a cancellation works**  (fixed 6 Oct 2026). A donation can have several reservation rows over time, for example a cancelled one followed by a new one, but only one active at a time. The second attempt while one is active should return `400` with "Donation already has an active reservation" (expected from the code, response not yet recorded).
+**Re-reserving after a cancellation works** ✅ (fixed 6 Oct 2026). A donation can have several reservation rows over time, for example a cancelled one followed by a new one, but only one active at a time. The second attempt while one is active should return `400` with "Donation already has an active reservation" (expected from the code, response not yet recorded).
 
 ---
 
-## Incidents  (food-safety flagging)
+## Incidents ✅ (food-safety flagging)
 
 Added after the host organisation asked for recipient organisations to be able to flag a problem with a donation, and for admins to follow it up.
 
@@ -190,6 +224,9 @@ Returns `201`:
   "id": 1,
   "donationId": 1,
   "donationTitle": "Fresh Bread",
+  "donorId": 1,
+  "donorName": "Test Donor",
+  "donorOrganisation": "Test Cafe",
   "reportedById": 2,
   "reportedByName": "Kitchen Contact",
   "description": "Verbal use-by date did not match the date printed on the stock",
@@ -200,6 +237,7 @@ Returns `201`:
   "resolutionNotes": null
 }
 ```
+Every incident response includes the donor who supplied the item (`donorId`, `donorName`, `donorOrganisation`) alongside the donation and the reporting organisation.
 
 **Resolve an incident**
 ```json
@@ -226,11 +264,11 @@ Dates that aren't valid ISO-8601 instants return `400`.
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/api/notifications/user/{userId}` |  `404` for an unknown user |
-| GET | `/api/notifications/user/{userId}/unread` |  |
-| GET | `/api/notifications/{id}` |  |
-| POST | `/api/notifications?recipientId=&type=&message=&relatedDonationId=` | `201`. An invalid `type` returns `400` |
-| PATCH | `/api/notifications/{id}/read` |  |
+| GET | `/api/notifications/user/{userId}` | ✅ `404` for an unknown user |
+| GET | `/api/notifications/user/{userId}/unread` | ◻️ |
+| GET | `/api/notifications/{id}` | ◻️ |
+| POST | `/api/notifications?recipientId=&type=&message=&relatedDonationId=` | ✅ `201`. An invalid `type` returns `400` |
+| PATCH | `/api/notifications/{id}/read` | ✅ |
 | PATCH | `/api/notifications/user/{userId}/read-all` | ◻️ |
 | DELETE | `/api/notifications/{id}` | ◻️ |
 
@@ -238,7 +276,7 @@ The donation, reservation and incident services do not create notifications, so 
 
 ---
 
-## Dashboard (`/api/dashboard`) 
+## Dashboard (`/api/dashboard`) ✅
 
 ### Overall statistics
 `GET /api/dashboard/stats`
@@ -273,11 +311,10 @@ The donation, reservation and incident services do not create notifications, so 
 
 ## Known limitations
 
-1. **No authentication.** Every endpoint is open (`permitAll`). Anyone can call any endpoint as any user id.
+1. **No real authentication.** Login checks the password but returns no token, and every other endpoint is open (`permitAll`). Anyone can call any endpoint as any user id, and anyone can register as `ADMIN` through `POST /api/users`.
 2. **Incident flagging is loosely controlled.** Any user with role `RECIPIENT_ORG` can flag any donation, even one they never reserved, and even if the org is still `PENDING`.
-3. **Incidents don't show the donor.** The response has `donationId` only. For the donor, call `GET /api/donations/{donationId}` and read `donorId` and `donorName`.
-4. **No automatic notifications** from donation, reservation or incident actions.
-5. **Data resets on restart.** The dev database is H2 in memory, so everything is wiped each time the app restarts and ids start again from 1.
+3. **No automatic notifications** from donation, reservation or incident actions.
+4. **Data resets on restart.** The dev database is H2 in memory, so everything is wiped each time the app restarts and ids start again from 1.
 
 ---
 
@@ -292,4 +329,4 @@ If Maven fails with `Index 6 out of bounds`, run `mvn clean` and start again.
 
 ---
 
-*Last checked: 6 Oct 2026, from the controller source and a 43-request manual test run. `UserService` and `NotificationService` have not been reviewed.*
+*Last checked: 6 Oct 2026, from the controller and service source, a 43-request manual test run, five login tests and the incident donor fields. `NotificationService` has not been reviewed.*
