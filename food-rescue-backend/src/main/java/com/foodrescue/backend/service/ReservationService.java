@@ -25,6 +25,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final DonationRepository donationRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * Get all reservations.
@@ -130,6 +131,14 @@ public class ReservationService {
         Reservation savedReservation =
                 reservationRepository.save(reservation);
 
+        // Tell the donor their donation has been reserved
+        notificationService.notifyUser(
+                donation.getDonor(),
+                Notification.NotificationType.RESERVATION_CONFIRMED,
+                notificationService.displayName(recipientOrg)
+                        + " reserved \"" + donation.getTitle() + "\" for pickup.",
+                donation.getId());
+
         return toDTO(savedReservation);
     }
 
@@ -145,6 +154,7 @@ public class ReservationService {
                         new RuntimeException(
                                 "Reservation not found with ID: " + id));
 
+        ReservationStatus previousStatus = reservation.getStatus();
         reservation.setStatus(newStatus);
 
         /*
@@ -175,6 +185,18 @@ public class ReservationService {
 
         Reservation updatedReservation =
                 reservationRepository.save(reservation);
+
+        // Tell the donor it was collected (only the first time it changes to COLLECTED)
+        if (ReservationStatus.COLLECTED.equals(newStatus)
+                && !ReservationStatus.COLLECTED.equals(previousStatus)) {
+            Donation donation = updatedReservation.getDonation();
+            notificationService.notifyUser(
+                    donation.getDonor(),
+                    Notification.NotificationType.DONATION_COLLECTED,
+                    "\"" + donation.getTitle() + "\" was collected by "
+                            + notificationService.displayName(updatedReservation.getRecipientOrg()) + ".",
+                    donation.getId());
+        }
 
         return toDTO(updatedReservation);
     }

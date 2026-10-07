@@ -28,6 +28,7 @@ public class DonationIncidentService {
     private final DonationIncidentRepository incidentRepository;
     private final DonationRepository donationRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * Get all incidents (admin dashboard default view), most recent first.
@@ -90,6 +91,15 @@ public class DonationIncidentService {
         // status defaults to OPEN via @PrePersist
 
         DonationIncident saved = incidentRepository.save(incident);
+
+        // Tell every administrator
+        notificationService.notifyAdmins(
+                Notification.NotificationType.INCIDENT_FLAGGED,
+                notificationService.displayName(reportedBy) + " flagged a "
+                        + request.getSeverity().name().toLowerCase() + " problem with \""
+                        + donation.getTitle() + "\".",
+                donation.getId());
+
         return toDTO(saved);
     }
 
@@ -98,12 +108,18 @@ public class DonationIncidentService {
      */
     public DonationIncidentDTO resolveIncident(Long id, ResolveIncidentRequest request) {
         DonationIncident incident = findEntity(id);
+        IncidentStatus previousStatus = incident.getStatus();
 
         incident.setStatus(IncidentStatus.RESOLVED);
         incident.setResolvedAt(Instant.now());
         incident.setResolutionNotes(request.getResolutionNotes());
 
         DonationIncident updated = incidentRepository.save(incident);
+
+        if (!IncidentStatus.RESOLVED.equals(previousStatus)) {
+            notifyReporterResolved(updated);
+        }
+
         return toDTO(updated);
     }
 
@@ -112,6 +128,7 @@ public class DonationIncidentService {
      */
     public DonationIncidentDTO updateIncidentStatus(Long id, IncidentStatus newStatus) {
         DonationIncident incident = findEntity(id);
+        IncidentStatus previousStatus = incident.getStatus();
         incident.setStatus(newStatus);
 
         if (IncidentStatus.RESOLVED.equals(newStatus) && incident.getResolvedAt() == null) {
@@ -119,6 +136,11 @@ public class DonationIncidentService {
         }
 
         DonationIncident updated = incidentRepository.save(incident);
+
+        if (IncidentStatus.RESOLVED.equals(newStatus) && !IncidentStatus.RESOLVED.equals(previousStatus)) {
+            notifyReporterResolved(updated);
+        }
+
         return toDTO(updated);
     }
 
@@ -141,6 +163,17 @@ public class DonationIncidentService {
                 .collect(Collectors.toList());
 
         return new IncidentReportDTO(from, to, incidents.size(), bySeverity, byStatus, incidentDTOs);
+    }
+
+    /**
+     * Tell the organisation that flagged an incident that it has been resolved.
+     */
+    private void notifyReporterResolved(DonationIncident incident) {
+        notificationService.notifyUser(
+                incident.getReportedBy(),
+                Notification.NotificationType.INCIDENT_RESOLVED,
+                "Your report about \"" + incident.getDonation().getTitle() + "\" has been resolved.",
+                incident.getDonation().getId());
     }
 
     private DonationIncident findEntity(Long id) {

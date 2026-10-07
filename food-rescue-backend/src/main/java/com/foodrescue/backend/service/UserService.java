@@ -3,6 +3,7 @@ package com.foodrescue.backend.service;
 import com.foodrescue.backend.dto.UserDTO;
 import com.foodrescue.backend.dto.CreateUserRequest;
 import com.foodrescue.backend.dto.UpdateUserRequest;
+import com.foodrescue.backend.model.Notification;
 import com.foodrescue.backend.model.User;
 import com.foodrescue.backend.model.VerificationStatus;
 import com.foodrescue.backend.repository.UserRepository;
@@ -24,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
     /**
      * Retrieve all users (admin only).
@@ -85,6 +87,8 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
+        VerificationStatus previousStatus = user.getVerificationStatus();
+
         if (request.getFullName() != null) {
             user.setFullName(request.getFullName());
         }
@@ -102,6 +106,17 @@ public class UserService {
         }
 
         User updatedUser = userRepository.save(user);
+
+        // Tell the organisation when it is approved (only the first time)
+        if (VerificationStatus.APPROVED.equals(updatedUser.getVerificationStatus())
+                && !VerificationStatus.APPROVED.equals(previousStatus)) {
+            notificationService.notifyUser(
+                    updatedUser,
+                    Notification.NotificationType.RECIPIENT_ORG_VERIFIED,
+                    "Your organisation has been approved. You can now reserve donations.",
+                    null);
+        }
+
         return toDTO(updatedUser);
     }
 

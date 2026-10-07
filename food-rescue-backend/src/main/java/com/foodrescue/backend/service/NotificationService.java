@@ -2,6 +2,7 @@ package com.foodrescue.backend.service;
 
 import com.foodrescue.backend.dto.NotificationDTO;
 import com.foodrescue.backend.model.Notification;
+import com.foodrescue.backend.model.Role;
 import com.foodrescue.backend.model.User;
 import com.foodrescue.backend.repository.NotificationRepository;
 import com.foodrescue.backend.repository.UserRepository;
@@ -77,6 +78,39 @@ public class NotificationService {
     }
 
     /**
+     * Notify one user. Other services call this when something happens
+     * (a reservation, a collection, an incident, an approval).
+     */
+    public void notifyUser(User recipient, Notification.NotificationType type,
+                           String message, Long relatedDonationId) {
+        Notification notification = new Notification();
+        notification.setRecipient(recipient);
+        notification.setType(type);
+        notification.setMessage(shorten(message));
+        notification.setRelatedDonationId(relatedDonationId);
+        notification.setRead(false);
+        notificationRepository.save(notification);
+    }
+
+    /**
+     * Notify every administrator.
+     */
+    public void notifyAdmins(Notification.NotificationType type, String message, Long relatedDonationId) {
+        for (User admin : userRepository.findByRole(Role.ADMIN)) {
+            notifyUser(admin, type, message, relatedDonationId);
+        }
+    }
+
+    /**
+     * The name to show for a user in a message: their organisation if they have one,
+     * otherwise their own name.
+     */
+    public String displayName(User user) {
+        String organisation = user.getOrganisationName();
+        return (organisation != null && !organisation.isBlank()) ? organisation : user.getFullName();
+    }
+
+    /**
      * Mark a notification as read.
      */
     public NotificationDTO markAsRead(Long id) {
@@ -110,6 +144,16 @@ public class NotificationService {
             throw new RuntimeException("Notification not found with ID: " + id);
         }
         notificationRepository.deleteById(id);
+    }
+
+    /**
+     * The message column holds 500 characters, so cut anything longer.
+     */
+    private String shorten(String message) {
+        if (message == null) {
+            return "";
+        }
+        return message.length() <= 500 ? message : message.substring(0, 497) + "...";
     }
 
     /**
