@@ -1,5 +1,6 @@
 package com.foodrescue.backend.controller;
 
+import com.foodrescue.backend.dto.AddIncidentNoteRequest;
 import com.foodrescue.backend.dto.CreateIncidentRequest;
 import com.foodrescue.backend.dto.DonationIncidentDTO;
 import com.foodrescue.backend.dto.IncidentReportDTO;
@@ -62,10 +63,23 @@ public class DonationIncidentController {
         return ResponseEntity.ok(incidentService.updateIncidentStatus(id, status));
     }
 
+    /**
+     * PATCH /api/incidents/{id}/notes - an administrator adds a note
+     */
+    @PatchMapping("/api/incidents/{id}/notes")
+    public ResponseEntity<DonationIncidentDTO> addNote(
+            @PathVariable Long id,
+            @Valid @RequestBody AddIncidentNoteRequest request) {
+        return ResponseEntity.ok(incidentService.addAdminNote(id, request));
+    }
+
+    /**
+     * PATCH /api/incidents/{id}/resolve - resolve with a required note
+     */
     @PatchMapping("/api/incidents/{id}/resolve")
     public ResponseEntity<DonationIncidentDTO> resolveIncident(
             @PathVariable Long id,
-            @RequestBody ResolveIncidentRequest request) {
+            @Valid @RequestBody ResolveIncidentRequest request) {
         return ResponseEntity.ok(incidentService.resolveIncident(id, request));
     }
 

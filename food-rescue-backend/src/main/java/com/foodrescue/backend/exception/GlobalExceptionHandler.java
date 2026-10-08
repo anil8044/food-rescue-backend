@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -59,6 +60,15 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Missing parameter",
                 "Required parameter '" + ex.getParameterName() + "' is missing.",
                 request);
+    }
+
+    /** A URL that doesn't match any endpoint, for example a mistyped address. */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoEndpoint(
+            NoResourceFoundException ex, WebRequest request) {
+
+        return build(HttpStatus.NOT_FOUND, "Not Found",
+                "There is no endpoint at this address.", request);
     }
 
     /** Failed login attempts. */

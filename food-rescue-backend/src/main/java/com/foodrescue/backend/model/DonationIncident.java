@@ -11,10 +11,9 @@ import lombok.Setter;
 import java.time.Instant;
 
 /**
- * A food-safety or quality incident flagged against a specific donation,
- * e.g. an expiry-date mismatch discovered at collection. Added following
- * a client-requested scope change (see host organisation correspondence
- * re: SA Health food-handling and record-keeping requirements).
+ * A food-safety or quality incident flagged against a specific donation by the
+ * recipient organisation that reserved or collected it. Requirements confirmed by
+ * the host organisation (South Australian Food Rescue Network) on 8 Oct 2026.
  */
 @Entity
 @Table(name = "donation_incident")
@@ -32,14 +31,22 @@ public class DonationIncident {
     @JoinColumn(name = "donation_id", nullable = false)
     private Donation donation;
 
-    /** The user who raised the flag - typically the recipient organisation that collected it. */
+    /** The user who raised the flag: a member of the recipient organisation that received the food. */
     @ManyToOne(optional = false)
     @JoinColumn(name = "reported_by_id", nullable = false)
     private User reportedBy;
 
+    /** The reporter's role in their organisation, e.g. "Kitchen manager". Optional. */
+    @Column(length = 100)
+    private String reporterRole;
+
     @NotBlank
     @Column(nullable = false, length = 1000)
     private String description;
+
+    /** Optional extra observations from the reporter. */
+    @Column(length = 1000)
+    private String additionalNotes;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -55,8 +62,17 @@ public class DonationIncident {
 
     private Instant resolvedAt;
 
+    /** What was done to resolve it. Required when an administrator resolves the incident. */
     @Column(length = 1000)
     private String resolutionNotes;
+
+    /** Optional note about any follow-up with the donor, recorded on resolution. */
+    @Column(length = 1000)
+    private String donorFollowUp;
+
+    /** Notes added by administrators. Each note is appended with its date and never overwritten. */
+    @Column(length = 4000)
+    private String adminNotes;
 
     @PrePersist
     void onCreate() {

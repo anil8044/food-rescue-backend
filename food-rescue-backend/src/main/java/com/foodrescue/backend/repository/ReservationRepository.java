@@ -12,9 +12,9 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     /**
-     * Only safe while a donation has at most one reservation row. Once a donation
-     * can have several (for example a cancelled one plus a new one), this throws
-     * an error, so use findFirstByDonationAndStatusNot instead.
+     * Only safe while a donation has at most one reservation row. A donation can now have
+     * several over time (a cancelled one plus a new one), so use
+     * findFirstByDonationAndStatusNot instead.
      */
     Optional<Reservation> findByDonation(Donation donation);
 
@@ -23,6 +23,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
      * Called with CANCELLED to ask "does this donation have an active reservation?"
      */
     Optional<Reservation> findFirstByDonationAndStatusNot(Donation donation, ReservationStatus status);
+
+    /**
+     * True if this organisation holds a reservation on the donation whose status is not the
+     * one given. Called with CANCELLED to ask "did this organisation reserve or collect it?"
+     */
+    boolean existsByDonationAndRecipientOrgAndStatusNot(Donation donation, User recipientOrg, ReservationStatus status);
 
     /** A recipient organisation's reservation history. */
     List<Reservation> findByRecipientOrgOrderByReservedAtDesc(User recipientOrg);
