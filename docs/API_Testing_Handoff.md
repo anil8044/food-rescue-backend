@@ -49,6 +49,20 @@ Errors from every controller now return a JSON body with an `error` field that e
 
 After the donor-fields change, re-run blocks 12 to 18 of the 43-request file (incident lists, resolve, report). Their results haven't been reported yet.
 
+### Automatic notifications (Anil, 7 Oct 2026)
+
+| Test | Expected | Result |
+|---|---|---|
+| Approve a recipient org | That org gets one `RECIPIENT_ORG_VERIFIED` notification | Pass (body checked) |
+| Reserve a donation | The donor gets `RESERVATION_CONFIRMED` | Pass (body checked) |
+| Mark the reservation collected | The donor gets `DONATION_COLLECTED` | Pass (body checked) |
+| Flag an incident | The admin gets `INCIDENT_FLAGGED` | Pass |
+| Resolve the incident | The reporting org gets `INCIDENT_RESOLVED` | Pass (body checked) |
+| Mark collected and resolve a second time | No new notifications (the highest id stays 5) | Pass |
+| `GET /api/dashboard/stats` after the full flow | `unreadNotifications` is 5, no longer 0 | Pass (body checked) |
+
+Anything that expects `unreadNotifications` to be 0 after a full run needs updating.
+
 ### Still to run
 
 **Quick confirmations**
@@ -56,6 +70,12 @@ After the donor-fields change, re-run blocks 12 to 18 of the 43-request file (in
 - [ ] Send block 43 a second time: expect `400` with "Donation already has an active reservation"
 - [ ] `GET /api/reservations`: reservation 2 `CANCELLED`, reservation 3 `PENDING`, both on donation 2
 - [ ] `GET /api/donations/2`: status `RESERVED`
+
+**Expiry job and notifications**
+- [ ] Expiry: create a donation whose `collectionDeadline` is in the past, wait about 70 seconds, then check `GET /api/donations/status/EXPIRED` lists it and `/api/donations/available` doesn't
+- [ ] A reserved donation with a past deadline is NOT expired by the job
+- [ ] `GET /api/notifications/user/{id}/unread`, mark one as read, mark all as read: the counts change as expected
+- [ ] Cancelling a reservation creates no notification (not built yet; confirm and log it)
 
 **Login**
 - [ ] Log in as an `ADMIN` (create one with `POST /api/users`, role `ADMIN`) and check the role comes back
@@ -89,7 +109,7 @@ After the donor-fields change, re-run blocks 12 to 18 of the 43-request file (in
 1. **No real authentication.** Login checks the password but there is no token, so anyone can call any endpoint as any user.
 2. **Incident flagging is loose.** There is no check that the flagging org collected that donation or is approved.
 3. **Anyone can register as `ADMIN`.** `POST /api/users` accepts any role, so the registration screen must only offer Donor and Recipient organisation.
-4. **Notifications aren't created automatically** by donations, reservations or incidents.
+4. **Some events still create no notification:** cancelling a reservation, a donation expiring, and a new donation being posted.
 5. **Test data disappears on restart.**
 
 Keep a defect log with screenshots and the request and response for every failing case. The 43-request file can be saved as shared test evidence. It's your regression run: re-run it after any backend change.
@@ -145,8 +165,8 @@ Keep a defect log with screenshots and the request and response for every failin
 - A reserved donation disappears from `/api/donations/available`. Refresh the list after a reservation.
 - Cancelling a reservation puts the donation back in the available list, and it can then be reserved again.
 - Each incident includes `donorId`, `donorName` and `donorOrganisation`, so the admin incident list needs no extra lookup.
+- Notifications now appear on their own. For a bell icon, call `GET /api/notifications/user/{id}/unread` and show the count. Mark one as read with `PATCH /api/notifications/{id}/read`, or all of them with `PATCH /api/notifications/user/{id}/read-all`.
 - Only users with role `RECIPIENT_ORG` can flag an incident. Show the "Flag a problem" button only to recipient orgs.
 
 ---
 
-*Compiled by Anil, 6 Oct 2026, from the source code and manual testing.*

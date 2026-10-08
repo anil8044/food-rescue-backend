@@ -7,7 +7,7 @@ All request bodies are JSON (`Content-Type: application/json`).
 - ✅ Tested by hand on 6 Oct 2026
 - ◻️ Implemented, but not tested individually
 
-All seven controllers (auth, users, donations, reservations, incidents, notifications, dashboard) were reviewed on 6 Oct 2026, along with `UserService`, `AuthService` and the donation, reservation, incident and analytics services. `NotificationService` was not reviewed, so its exact error wording is unconfirmed.
+All seven controllers (auth, users, donations, reservations, incidents, notifications, dashboard) were reviewed on 6 Oct 2026, along with `UserService`, `AuthService` and the donation, reservation, incident, notification and analytics services.
 
 ---
 
@@ -22,7 +22,7 @@ All seven controllers (auth, users, donations, reservations, incidents, notifica
 | Reservation `status` | `PENDING`, `CONFIRMED`, `COLLECTED`, `CANCELLED` |
 | Incident `severity` | `MINOR`, `MODERATE`, `SEVERE` |
 | Incident `status` | `OPEN`, `UNDER_REVIEW`, `RESOLVED` |
-| Notification `type` | `NEW_DONATION_AVAILABLE`, `RESERVATION_CONFIRMED`, `DONATION_EXPIRING_SOON`, `DONATION_COLLECTED`, `RECIPIENT_ORG_VERIFIED` |
+| Notification `type` | `NEW_DONATION_AVAILABLE`, `RESERVATION_CONFIRMED`, `DONATION_EXPIRING_SOON`, `DONATION_COLLECTED`, `RECIPIENT_ORG_VERIFIED`, `INCIDENT_FLAGGED`, `INCIDENT_RESOLVED` |
 
 Dates and times are ISO-8601 instants, for example `2026-12-31T18:00:00Z`.
 
@@ -159,6 +159,8 @@ The value is `APPROVED`. `VERIFIED` is not valid.
 ```
 Required: `title`, `category`, `quantity` (positive), `quantityUnit`, `expiryDateTime`, `collectionDeadline`. Returns `201` with `status: "AVAILABLE"`.
 
+**Automatic expiry.** A background job runs every minute (first run 10 seconds after the app starts). It sets any `AVAILABLE` donation to `EXPIRED` once its `collectionDeadline` has passed. Reserved and collected donations are left alone.
+
 ---
 
 ## Reservations (`/api/reservations`) ✅
@@ -272,7 +274,17 @@ Dates that aren't valid ISO-8601 instants return `400`.
 | PATCH | `/api/notifications/user/{userId}/read-all` | ◻️ |
 | DELETE | `/api/notifications/{id}` | ◻️ |
 
-The donation, reservation and incident services do not create notifications, so nothing is generated automatically yet. Notifications exist only when created through `POST /api/notifications`.
+Notifications are created **automatically** by these events. Each fires once, so repeating the same action doesn't send a duplicate:
+
+| Event | Who is notified | Type |
+|---|---|---|
+| A recipient organisation reserves a donation | The donor who posted it | `RESERVATION_CONFIRMED` |
+| A reservation is marked collected | The donor | `DONATION_COLLECTED` |
+| A recipient organisation flags an incident | Every administrator | `INCIDENT_FLAGGED` |
+| An admin resolves an incident | The organisation that flagged it | `INCIDENT_RESOLVED` |
+| An admin approves a recipient organisation | That organisation | `RECIPIENT_ORG_VERIFIED` |
+
+Each notification has a short message (for example `Test Community Kitchen reserved "Fresh Bread" for pickup.`) and, where it applies, a `relatedDonationId`. `NEW_DONATION_AVAILABLE` and `DONATION_EXPIRING_SOON` exist as types, but nothing creates them yet. Any notification can still be created by hand with `POST /api/notifications`. The dashboard's `unreadNotifications` counts these too.
 
 ---
 
@@ -313,8 +325,7 @@ The donation, reservation and incident services do not create notifications, so 
 
 1. **No real authentication.** Login checks the password but returns no token, and every other endpoint is open (`permitAll`). Anyone can call any endpoint as any user id, and anyone can register as `ADMIN` through `POST /api/users`.
 2. **Incident flagging is loosely controlled.** Any user with role `RECIPIENT_ORG` can flag any donation, even one they never reserved, and even if the org is still `PENDING`.
-3. **No automatic notifications** from donation, reservation or incident actions.
-4. **Data resets on restart.** The dev database is H2 in memory, so everything is wiped each time the app restarts and ids start again from 1.
+3. **Data resets on restart.** The dev database is H2 in memory, so everything is wiped each time the app restarts and ids start again from 1.
 
 ---
 
@@ -329,4 +340,3 @@ If Maven fails with `Index 6 out of bounds`, run `mvn clean` and start again.
 
 ---
 
-*Last checked: 6 Oct 2026, from the controller and service source, a 43-request manual test run, five login tests and the incident donor fields. `NotificationService` has not been reviewed.*
