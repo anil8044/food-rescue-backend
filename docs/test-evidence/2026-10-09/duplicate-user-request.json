@@ -1,0 +1,9 @@
+{
+    "password":  "password123",
+    "fullName":  "Test Donor",
+    "address":  "123 Main St",
+    "organisationName":  "Test Cafe",
+    "email":  "donor@test.com",
+    "role":  "DONOR",
+    "phoneNumber":  "08 1234 5678"
+}

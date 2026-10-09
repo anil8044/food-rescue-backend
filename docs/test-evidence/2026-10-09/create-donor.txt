@@ -1,0 +1,5 @@
+﻿Test: Create donor
+Endpoint: POST /api/users
+Expected status: 201
+Actual status: 201
+Response: {"id":1,"fullName":"Test Donor","email":"donor@test.com","role":"DONOR","organisationName":"Test Cafe","phoneNumber":"08 1234 5678","address":"123 Main St","verificationStatus":null,"createdAt":"2026-10-09T03:23:21.974634700Z"}

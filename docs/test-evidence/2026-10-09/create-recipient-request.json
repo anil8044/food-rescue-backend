@@ -1,0 +1,9 @@
+{
+    "password":  "password123",
+    "fullName":  "Test Recipient",
+    "address":  "456 Main St",
+    "organisationName":  "Test Charity",
+    "email":  "recipient@test.com",
+    "role":  "RECIPIENT_ORG",
+    "phoneNumber":  "08 1234 5679"
+}

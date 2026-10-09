@@ -1,0 +1,12 @@
+{
+    "collectionDeadline":  "2026-10-09T05:07:40Z",
+    "description":  "Day 3 QA test donation",
+    "quantityUnit":  "kg",
+    "category":  "BAKERY",
+    "dietaryInfo":  "Contains gluten",
+    "expiryDateTime":  "2026-12-31T18:00:00Z",
+    "pickupAddress":  "123 Market St, Adelaide",
+    "quantity":  5,
+    "storageInfo":  "Store at room temperature",
+    "title":  "Day 3 automatic expiry test"
+}

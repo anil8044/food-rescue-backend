@@ -1,0 +1,182 @@
+﻿**********************
+Windows PowerShell 脚本开始
+开始时间: 20261009132522
+用户名: DESKTOP-KBIN1MR\Tommy
+RunAs 用户: DESKTOP-KBIN1MR\Tommy
+配置名称: 
+计算机: DESKTOP-KBIN1MR (Microsoft Windows NT 10.0.26200.0)
+主机应用程序: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noexit -command try { . "c:\Users\Tommy\AppData\Local\Programs\Microsoft VS Code\2a59476c9b\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegration.ps1" } catch {}
+进程 ID: 36424
+PSVersion: 5.1.26100.9444
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9444
+BuildVersion: 10.0.26100.9444
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+已启动脚本，输出文件为 .\docs\test-evidence\2026-10-09\backend-test-log-132522.txt
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git rev-parse HEAD
+curl.exe -i http://localhost:8080/actuator/health
+curl.exe -i http://localhost:8080/api/users
+
+{"status":"UP"}
+[]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git rev-parse HEAD
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>a63315a7d3632729f4815a93f962c21630562826
+a63315a7d3632729f4815a93f962c21630562826 : 无法将“a63315a7d3632729f4815a93f962c21630562826”项识别为 cmdlet、函数、脚本文件或可运行程序的名称。请检查
+名称的拼写，如果包括路径，请确保路径正确，然后再试一次。
+所在位置 行:1 字符: 1
++ a63315a7d3632729f4815a93f962c21630562826
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (a63315a7d3632729f4815a93f962c21630562826:String) [], CommandNotFoundExcep
+tion
+    + FullyQualifiedErrorId : CommandNotFoundException
+a63315a7d3632729f4815a93f962c21630562826 : 无法将“a63315a7d3632729f4815a93f962c21630562826”项识别为
+cmdlet、函数、脚本文件或可运行程序的名称。请检查名称的拼写，如果包括路径，请确保路径正确，然后再试一次
+。
+所在位置 行:1 字符: 1
++ a63315a7d3632729f4815a93f962c21630562826
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (a63315a7d3632729f4815a93f962c21630562826:String) [], C
+   ommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+]633;D;1]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git branch --show-current
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git status --short
+git branch -a
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git fetch origin
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git rev-list --left-right --count HEAD...origin/backend
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-ChildItem .\docs\test-evidence\2026-10-09 -Recurse
+
+
+    目录: C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend\docs
+    \test-evidence\2026-10-09
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         2026/10/9     13:25           1141 backend-test-log-132522.txt
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-Content .\docs\test-evidence\2026-10-09\backend-test-log-132522.txt
+**********************
+Windows PowerShell 脚本开始
+开始时间: 20261009132522
+用户名: DESKTOP-KBIN1MR\Tommy
+RunAs 用户: DESKTOP-KBIN1MR\Tommy
+配置名称:
+计算机: DESKTOP-KBIN1MR (Microsoft Windows NT 10.0.26200.0)
+主机应用程序: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noexit -command try { . "c:\Users\Tommy\AppData\Local\Programs\Microsoft VS Code\2a59476c9b\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegration.ps1" } catch {}
+进程 ID: 36424
+PSVersion: 5.1.26100.9444
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9444
+BuildVersion: 10.0.26100.9444
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+已启动脚本，输出文件为 .\docs\test-evidence\2026-10-09\backend-test-log-132522.txt
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git rev-parse HEAD
+curl.exe -i http://localhost:8080/actuator/health
+curl.exe -i http://localhost:8080/api/users
+
+{"status":"UP"}
+[]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git rev-parse HEAD
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>a63315a7d3632729f4815a93f962c21630562826
+a63315a7d3632729f4815a93f962c21630562826 : 无法将“a63315a7d3632729f4815a93f962c21630562826”项识别为 cmdlet、函数、脚本文件或可运行程序的名称。请检查
+名称的拼写，如果包括路径，请确保路径正确，然后再试一次。
+所在位置 行:1 字符: 1
++ a63315a7d3632729f4815a93f962c21630562826
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (a63315a7d3632729f4815a93f962c21630562826:String) [], CommandNotFoundExcep
+tion
+    + FullyQualifiedErrorId : CommandNotFoundException
+a63315a7d3632729f4815a93f962c21630562826 : 无法将“a63315a7d3632729f4815a93f962c21630562826”项识别为
+cmdlet、函数、脚本文件或可运行程序的名称。请检查名称的拼写，如果包括路径，请确保路径正确，然后再试一次
+。
+所在位置 行:1 字符: 1
++ a63315a7d3632729f4815a93f962c21630562826
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (a63315a7d3632729f4815a93f962c21630562826:String) [], C
+   ommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+]633;D;1]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git branch --show-current
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git status --short
+git branch -a
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git fetch origin
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git rev-list --left-right --count HEAD...origin/backend
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-ChildItem .\docs\test-evidence\2026-10-09 -Recurse
+
+
+    目录: C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend\docs
+    \test-evidence\2026-10-09
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         2026/10/9     13:25           1141 backend-test-log-132522.txt
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>notepad .\docs\test-evidence\2026-10-09\backend-test-log-132522.txt
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-ChildItem -Path . -Filter API_DOCUMENTATION.md -Recurse | Select-Object -ExpandProperty FullName
+C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend\docs\API_DOCUMENTATION.md
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>notepad .\docs\API_DOCUMENTATION.md
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$body = @{
+    fullName = "Test Donor"
+    email = "donor@test.com"
+    password = "password123"
+    role = "DONOR"
+    organisationName = "Test Cafe"
+    phoneNumber = "08 1234 5678"
+    address = "123 Main St"
+} | ConvertTo-Json
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$response = Invoke-WebRequest -Uri "http://localhost:8080/api/users" -Method Post -ContentType "application/json" -Body $body -UseBasicParsing
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>"Status: $($response.StatusCode)"
+Status: 201
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$response.Content
+{"id":1,"fullName":"Test Donor","email":"donor@test.com","role":"DONOR","organisationName":"Test Cafe","phoneNumber":"08 1234 5678","address":"123 Main St","verificationStatus":null,"createdAt":"2026-10-09T03:23:21.974634700Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B

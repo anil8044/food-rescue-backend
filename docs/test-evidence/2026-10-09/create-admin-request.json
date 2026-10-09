@@ -1,0 +1,9 @@
+{
+    "password":  "password123",
+    "fullName":  "Test Admin",
+    "address":  "789 Main St",
+    "organisationName":  "QA Team",
+    "email":  "admin@test.com",
+    "role":  "ADMIN",
+    "phoneNumber":  "08 1234 5680"
+}
