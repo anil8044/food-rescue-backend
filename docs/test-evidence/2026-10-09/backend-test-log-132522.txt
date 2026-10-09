@@ -180,3 +180,1685 @@ Status: 201
 PS>$response.Content
 {"id":1,"fullName":"Test Donor","email":"donor@test.com","role":"DONOR","organisationName":"Test Cafe","phoneNumber":"08 1234 5678","address":"123 Main St","verificationStatus":null,"createdAt":"2026-10-09T03:23:21.974634700Z"}
 ]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@(
+    "Test: Create donor"
+    "Endpoint: POST /api/users"
+    "Expected status: 201"
+    "Actual status: $($response.StatusCode)"
+    "Response: $($response.Content)"
+) | Set-Content .\docs\test-evidence\2026-10-09\create-donor.txt -Encoding UTF8
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -i http://localhost:8080/api/users/1
+03:23:21.974635Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i http://localhost:8080/api/users/1 | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\get-user-1.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:27:46 GMT
+
+{"id":1,"fullName":"Test Donor","email":"donor@test.com","role":"DONOR","organisationName":"Test Cafe","phoneNumber":"08 1234 5678","address":"123 Main St","verificationStatus":null,"createdAt":"2026-10-09T03:23:21.974635Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i http://localhost:8080/api/users/999999 | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\get-user-not-found.txt
+HTTP/1.1 404
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:27:52 GMT
+
+{"status":404,"message":"Not Found","error":"User not found with ID: 999999","timestamp":"2026-10-09T03:27:52.593096700Z","path":"/api/users/999999"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i http://localhost:8080/api/users/abc | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\get-user-invalid-id.txt
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:29:24 GMT
+Connection: close
+
+{"status":400,"message":"Invalid parameter","error":"Invalid value 'abc' for parameter 'id'.","timestamp":"2026-10-09T03:29:24.615739100Z","path":"/api/users/abc"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$body | Set-Content .\docs\test-evidence\2026-10-09\duplicate-user-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST http://localhost:8080/api/users -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/duplicate-user-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-user-duplicate-email.txt
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:36:42 GMT
+Connection: close
+
+{"status":400,"message":"Bad Request","error":"Email already exists: donor@test.com","timestamp":"2026-10-09T03:36:42.448765300Z","path":"/api/users"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '/api/auth/login' -Context 5,25
+
+  docs\API_DOCUMENTATION.md:63:
+  docs\API_DOCUMENTATION.md:64:## Login (`/api/auth`) ✅
+  docs\API_DOCUMENTATION.md:65:
+  docs\API_DOCUMENTATION.md:66:| Method | Path | Purpose |
+  docs\API_DOCUMENTATION.md:67:|---|---|---|
+> docs\API_DOCUMENTATION.md:68:| POST | `/api/auth/login` | Check an email and password and return the
+ user |
+  docs\API_DOCUMENTATION.md:69:
+  docs\API_DOCUMENTATION.md:70:**Request**
+  docs\API_DOCUMENTATION.md:71:```json
+  docs\API_DOCUMENTATION.md:72:{
+  docs\API_DOCUMENTATION.md:73:  "email": "donor@test.com",
+  docs\API_DOCUMENTATION.md:74:  "password": "password123"
+  docs\API_DOCUMENTATION.md:75:}
+  docs\API_DOCUMENTATION.md:76:```
+  docs\API_DOCUMENTATION.md:77:Returns `200` with the user, including the role the frontend needs to s
+how the right screens. The password hash is never returned:
+  docs\API_DOCUMENTATION.md:78:```json
+  docs\API_DOCUMENTATION.md:79:{
+  docs\API_DOCUMENTATION.md:80:  "id": 1,
+  docs\API_DOCUMENTATION.md:81:  "fullName": "Test Donor",
+  docs\API_DOCUMENTATION.md:82:  "email": "donor@test.com",
+  docs\API_DOCUMENTATION.md:83:  "role": "DONOR",
+  docs\API_DOCUMENTATION.md:84:  "organisationName": "Test Cafe",
+  docs\API_DOCUMENTATION.md:85:  "phoneNumber": null,
+  docs\API_DOCUMENTATION.md:86:  "address": null,
+  docs\API_DOCUMENTATION.md:87:  "verificationStatus": null,
+  docs\API_DOCUMENTATION.md:88:  "createdAt": "2026-10-06T08:57:37.906630Z"
+  docs\API_DOCUMENTATION.md:89:}
+  docs\API_DOCUMENTATION.md:90:```
+  docs\API_DOCUMENTATION.md:91:- A wrong password and an unknown email both return `401` with the same
+ text, `Invalid email or password`, so the response doesn't reveal which accounts exist.
+  docs\API_DOCUMENTATION.md:92:- A blank email or password returns `400` with a validation message.
+  docs\API_DOCUMENTATION.md:93:- **There is no token.** The frontend keeps the returned user and sends
+ the user id where an endpoint asks for it. This is a stop-gap for the project, not real security (see
+ Known limitations).
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    email = "donor@test.com"
+    password = "password123"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\login-valid-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/login-valid-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\login-valid.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:43:30 GMT
+
+{"id":1,"fullName":"Test Donor","email":"donor@test.com","role":"DONOR","organisationName":"Test Cafe","phoneNumber":"08 1234 5678","address":"123 Main St","verificationStatus":null,"createdAt":"2026-10-09T03:23:21.974635Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    email = "donor@test.com"
+    password = "wrongpassword"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\login-wrong-password-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/login-wrong-password-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\login-wrong-password.txt
+HTTP/1.1 401
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:44:12 GMT
+
+{"status":401,"message":"Unauthorized","error":"Invalid email or password","timestamp":"2026-10-09T03:44:12.278510200Z","path":"/api/auth/login"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    email = "unknown@test.com"
+    password = "password123"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\login-unknown-email-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/login-unknown-email-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\login-unknown-email.txt
+HTTP/1.1 401
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:44:54 GMT
+
+{"status":401,"message":"Unauthorized","error":"Invalid email or password","timestamp":"2026-10-09T03:44:54.297473600Z","path":"/api/auth/login"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    email = "donor@test.com"
+    password = ""
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\login-blank-password-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/login-blank-password-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\login-blank-password.txt
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:46:25 GMT
+Connection: close
+
+{"status":400,"message":"Validation failed","error":"password: Password is required","timestamp":"2026-10-09T03:46:25.747834200Z","path":"/api/auth/login"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    email = ""
+    password = "password123"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\login-blank-email-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/login-blank-email-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\login-blank-email.txt
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:47:38 GMT
+Connection: close
+
+{"status":400,"message":"Validation failed","error":"email: Email is required","timestamp":"2026-10-09T03:47:38.813304700Z","path":"/api/auth/login"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    fullName = "Test Recipient"
+    email = "recipient@test.com"
+    password = "password123"
+    role = "RECIPIENT_ORG"
+    organisationName = "Test Charity"
+    phoneNumber = "08 1234 5679"
+    address = "456 Main St"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\create-recipient-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST http://localhost:8080/api/users -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/create-recipient-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-recipient.txt
+HTTP/1.1 201
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:49:47 GMT
+
+{"id":2,"fullName":"Test Recipient","email":"recipient@test.com","role":"RECIPIENT_ORG","organisationName":"Test Charity","phoneNumber":"08 1234 5679","address":"456 Main St","verificationStatus":"PENDING","createdAt":"2026-10-09T03:49:47.528681Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i http://localhost:8080/api/users/pending-verifications | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\pending-verifications.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 03:52:56 GMT
+
+[{"id":2,"fullName":"Test Recipient","email":"recipient@test.com","role":"RECIPIENT_ORG","organisationName":"Test Charity","phoneNumber":"08 1234 5679","address":"456 Main St","verificationStatus":"PENDING","createdAt":"2026-10-09T03:49:47.528681Z"}]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern 'POST /api/donations' -SimpleMatch -Context 5,45
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '/api/donations' -SimpleMatch -Context 3,40
+
+  docs\API_DOCUMENTATION.md:38:  "message": "Bad Request",
+  docs\API_DOCUMENTATION.md:39:  "error": "Only recipient organisations can flag an incident",
+  docs\API_DOCUMENTATION.md:40:  "timestamp": "2026-10-06T01:31:48.406447800Z",
+> docs\API_DOCUMENTATION.md:41:  "path": "/api/donations/1/incidents"
+  docs\API_DOCUMENTATION.md:42:}
+  docs\API_DOCUMENTATION.md:43:```
+  docs\API_DOCUMENTATION.md:44:
+  docs\API_DOCUMENTATION.md:45:`error` holds the explanation and is safe to show to users.
+  docs\API_DOCUMENTATION.md:46:
+  docs\API_DOCUMENTATION.md:47:| Situation | Status | `error` text |
+  docs\API_DOCUMENTATION.md:48:|---|---|---|
+  docs\API_DOCUMENTATION.md:49:| Missing or invalid field in a request body | 400 | `description: Desc
+ription is required` |
+  docs\API_DOCUMENTATION.md:50:| Unknown enum value in a request body (e.g. severity `CRITICAL`) | 400
+ | `The request body is malformed or contains an invalid value, such as an unknown severity or categor
+y.` |
+  docs\API_DOCUMENTATION.md:51:| Invalid value in the URL (e.g. `/donations/status/FOO`) | 400 | `Inva
+lid value 'FOO' for parameter 'status'.` |
+  docs\API_DOCUMENTATION.md:52:| Required query parameter missing | 400 | `Required parameter 'donorId
+' is missing.` |
+  docs\API_DOCUMENTATION.md:53:| Business rule broken | 400 | `Recipient organisation must be approved
+ before making reservations` |
+  docs\API_DOCUMENTATION.md:54:| Wrong email or password at login | 401 | `Invalid email or password`
+|
+  docs\API_DOCUMENTATION.md:55:| Record not found | 404 | `Donation not found with ID: 999` |
+  docs\API_DOCUMENTATION.md:56:| Unexpected server error | 500 | varies |
+  docs\API_DOCUMENTATION.md:57:
+  docs\API_DOCUMENTATION.md:58:Business-rule errors that were checked: reserving as an unapproved reci
+pient, a donor flagging an incident, a duplicate email on user creation, a malformed incident-report d
+ate. Not-found checks: unknown donation, incident, user, notification list and dashboard user, all ret
+urning `404`. For the user, notification and dashboard cases only the status code was recorded in test
+ing. From the `UserService` source, a duplicate email says `Email already exists: <email>` and an unkn
+own user says `User not found with ID: <id>` (or `... with email: <email>`).
+  docs\API_DOCUMENTATION.md:59:
+  docs\API_DOCUMENTATION.md:60:**How 404 is chosen:** a plain error message containing "not found" bec
+omes `404`. Any other deliberate error becomes `400`.
+  docs\API_DOCUMENTATION.md:61:
+  docs\API_DOCUMENTATION.md:62:---
+  docs\API_DOCUMENTATION.md:63:
+  docs\API_DOCUMENTATION.md:64:## Login (`/api/auth`) ✅
+  docs\API_DOCUMENTATION.md:65:
+  docs\API_DOCUMENTATION.md:66:| Method | Path | Purpose |
+  docs\API_DOCUMENTATION.md:67:|---|---|---|
+  docs\API_DOCUMENTATION.md:68:| POST | `/api/auth/login` | Check an email and password and return the
+ user |
+  docs\API_DOCUMENTATION.md:69:
+  docs\API_DOCUMENTATION.md:70:**Request**
+  docs\API_DOCUMENTATION.md:71:```json
+  docs\API_DOCUMENTATION.md:72:{
+  docs\API_DOCUMENTATION.md:73:  "email": "donor@test.com",
+  docs\API_DOCUMENTATION.md:74:  "password": "password123"
+  docs\API_DOCUMENTATION.md:75:}
+  docs\API_DOCUMENTATION.md:76:```
+  docs\API_DOCUMENTATION.md:77:Returns `200` with the user, including the role the frontend needs to s
+how the right screens. The password hash is never returned:
+  docs\API_DOCUMENTATION.md:78:```json
+  docs\API_DOCUMENTATION.md:79:{
+  docs\API_DOCUMENTATION.md:80:  "id": 1,
+  docs\API_DOCUMENTATION.md:81:  "fullName": "Test Donor",
+  docs\API_DOCUMENTATION.md:129:
+  docs\API_DOCUMENTATION.md:130:---
+  docs\API_DOCUMENTATION.md:131:
+> docs\API_DOCUMENTATION.md:132:## Donations (`/api/donations`) ✅
+  docs\API_DOCUMENTATION.md:133:
+  docs\API_DOCUMENTATION.md:134:| Method | Path | Purpose |
+  docs\API_DOCUMENTATION.md:135:|---|---|---|
+> docs\API_DOCUMENTATION.md:136:| GET | `/api/donations` | All donations |
+> docs\API_DOCUMENTATION.md:137:| GET | `/api/donations/{id}` | One donation |
+> docs\API_DOCUMENTATION.md:138:| GET | `/api/donations/available` | Donations with status `AVAILABLE`
+ |
+> docs\API_DOCUMENTATION.md:139:| GET | `/api/donations/donor/{donorId}` | One donor's donations |
+> docs\API_DOCUMENTATION.md:140:| POST | `/api/donations?donorId={id}` | Create a donation |
+> docs\API_DOCUMENTATION.md:141:| GET | `/api/donations/status/{status}` | Filter by status |
+> docs\API_DOCUMENTATION.md:142:| PATCH | `/api/donations/{id}/status?status={STATUS}` | Change status
+ |
+> docs\API_DOCUMENTATION.md:143:| DELETE | `/api/donations/{id}` | Delete (204) |
+  docs\API_DOCUMENTATION.md:144:
+  docs\API_DOCUMENTATION.md:145:**Create a donation**
+  docs\API_DOCUMENTATION.md:146:```json
+  docs\API_DOCUMENTATION.md:147:{
+  docs\API_DOCUMENTATION.md:148:  "title": "Fresh Bread",
+  docs\API_DOCUMENTATION.md:149:  "description": "Surplus loaves from today",
+  docs\API_DOCUMENTATION.md:150:  "category": "BAKERY",
+  docs\API_DOCUMENTATION.md:151:  "quantity": 5,
+  docs\API_DOCUMENTATION.md:152:  "quantityUnit": "kg",
+  docs\API_DOCUMENTATION.md:153:  "dietaryInfo": "Contains gluten",
+  docs\API_DOCUMENTATION.md:154:  "storageInfo": "Store at room temperature",
+  docs\API_DOCUMENTATION.md:155:  "expiryDateTime": "2026-12-31T18:00:00Z",
+  docs\API_DOCUMENTATION.md:156:  "collectionDeadline": "2026-12-31T17:00:00Z",
+  docs\API_DOCUMENTATION.md:157:  "pickupAddress": "123 Market St, Adelaide"
+  docs\API_DOCUMENTATION.md:158:}
+  docs\API_DOCUMENTATION.md:159:```
+  docs\API_DOCUMENTATION.md:160:Required: `title`, `category`, `quantity` (positive), `quantityUnit`,
+`expiryDateTime`, `collectionDeadline`. Returns `201` with `status: "AVAILABLE"`.
+  docs\API_DOCUMENTATION.md:161:
+  docs\API_DOCUMENTATION.md:162:**Automatic expiry.** A background job runs every minute (first run 10
+ seconds after the app starts). It sets any `AVAILABLE` donation to `EXPIRED` once its `collectionDead
+line` has passed. Reserved and collected donations are left alone.
+  docs\API_DOCUMENTATION.md:163:
+  docs\API_DOCUMENTATION.md:164:---
+  docs\API_DOCUMENTATION.md:165:
+  docs\API_DOCUMENTATION.md:166:## Reservations (`/api/reservations`) ✅
+  docs\API_DOCUMENTATION.md:167:
+  docs\API_DOCUMENTATION.md:168:| Method | Path | Purpose |
+  docs\API_DOCUMENTATION.md:169:|---|---|---|
+  docs\API_DOCUMENTATION.md:170:| GET | `/api/reservations` | All reservations |
+  docs\API_DOCUMENTATION.md:171:| GET | `/api/reservations/{id}` | One reservation |
+  docs\API_DOCUMENTATION.md:172:| GET | `/api/reservations/recipient/{recipientOrgId}` | A recipient o
+rg's reservations |
+  docs\API_DOCUMENTATION.md:173:| POST | `/api/reservations?recipientOrgId={id}` | Create a reservatio
+n |
+  docs\API_DOCUMENTATION.md:174:| GET | `/api/reservations/status/{status}` | Filter by status |
+  docs\API_DOCUMENTATION.md:175:| PATCH | `/api/reservations/{id}/status?status={STATUS}` | Change sta
+tus |
+  docs\API_DOCUMENTATION.md:176:| DELETE | `/api/reservations/{id}` | Cancel (204) |
+  docs\API_DOCUMENTATION.md:177:
+  docs\API_DOCUMENTATION.md:178:**Create a reservation**
+  docs\API_DOCUMENTATION.md:179:```json
+  docs\API_DOCUMENTATION.md:180:{
+  docs\API_DOCUMENTATION.md:181:  "donationId": 1,
+  docs\API_DOCUMENTATION.md:182:  "scheduledPickupTime": "2026-12-31T16:00:00Z"
+  docs\API_DOCUMENTATION.md:183:}
+  docs\API_DOCUMENTATION.md:204:
+  docs\API_DOCUMENTATION.md:205:| Method | Path | Purpose |
+  docs\API_DOCUMENTATION.md:206:|---|---|---|
+> docs\API_DOCUMENTATION.md:207:| POST | `/api/donations/{donationId}/incidents?reportedByUserId={id}`
+ | Flag an incident |
+> docs\API_DOCUMENTATION.md:208:| GET | `/api/donations/{donationId}/incidents` | Incidents for one do
+nation |
+  docs\API_DOCUMENTATION.md:209:| GET | `/api/incidents` | All incidents, newest first |
+  docs\API_DOCUMENTATION.md:210:| GET | `/api/incidents/{id}` | One incident (`404` if missing) |
+  docs\API_DOCUMENTATION.md:211:| GET | `/api/incidents/status/{status}` | Filter by `OPEN`, `UNDER_RE
+VIEW` or `RESOLVED` |
+  docs\API_DOCUMENTATION.md:212:| PATCH | `/api/incidents/{id}/status?status={STATUS}` | Change status
+, e.g. to `UNDER_REVIEW` |
+  docs\API_DOCUMENTATION.md:213:| PATCH | `/api/incidents/{id}/resolve` | Resolve with notes |
+  docs\API_DOCUMENTATION.md:214:| GET | `/api/incidents/report?from={instant}&to={instant}` | Summary
+for a date range |
+  docs\API_DOCUMENTATION.md:215:
+  docs\API_DOCUMENTATION.md:216:**Flag an incident** (the reporter must have role `RECIPIENT_ORG`, oth
+erwise `400`)
+  docs\API_DOCUMENTATION.md:217:```json
+  docs\API_DOCUMENTATION.md:218:{
+  docs\API_DOCUMENTATION.md:219:  "description": "Verbal use-by date did not match the date printed on
+ the stock",
+  docs\API_DOCUMENTATION.md:220:  "severity": "SEVERE"
+  docs\API_DOCUMENTATION.md:221:}
+  docs\API_DOCUMENTATION.md:222:```
+  docs\API_DOCUMENTATION.md:223:Returns `201`:
+  docs\API_DOCUMENTATION.md:224:```json
+  docs\API_DOCUMENTATION.md:225:{
+  docs\API_DOCUMENTATION.md:226:  "id": 1,
+  docs\API_DOCUMENTATION.md:227:  "donationId": 1,
+  docs\API_DOCUMENTATION.md:228:  "donationTitle": "Fresh Bread",
+  docs\API_DOCUMENTATION.md:229:  "donorId": 1,
+  docs\API_DOCUMENTATION.md:230:  "donorName": "Test Donor",
+  docs\API_DOCUMENTATION.md:231:  "donorOrganisation": "Test Cafe",
+  docs\API_DOCUMENTATION.md:232:  "reportedById": 2,
+  docs\API_DOCUMENTATION.md:233:  "reportedByName": "Kitchen Contact",
+  docs\API_DOCUMENTATION.md:234:  "description": "Verbal use-by date did not match the date printed on
+ the stock",
+  docs\API_DOCUMENTATION.md:235:  "severity": "SEVERE",
+  docs\API_DOCUMENTATION.md:236:  "status": "OPEN",
+  docs\API_DOCUMENTATION.md:237:  "reportedAt": "2026-10-06T01:15:51.374220100Z",
+  docs\API_DOCUMENTATION.md:238:  "resolvedAt": null,
+  docs\API_DOCUMENTATION.md:239:  "resolutionNotes": null
+  docs\API_DOCUMENTATION.md:240:}
+  docs\API_DOCUMENTATION.md:241:```
+  docs\API_DOCUMENTATION.md:242:Every incident response includes the donor who supplied the item (`don
+orId`, `donorName`, `donorOrganisation`) alongside the donation and the reporting organisation.
+  docs\API_DOCUMENTATION.md:243:
+  docs\API_DOCUMENTATION.md:244:**Resolve an incident**
+  docs\API_DOCUMENTATION.md:245:```json
+  docs\API_DOCUMENTATION.md:246:{ "resolutionNotes": "Donor contacted and the date check added to the
+collection process" }
+  docs\API_DOCUMENTATION.md:247:```
+  docs\API_DOCUMENTATION.md:248:Returns `200` with `status: "RESOLVED"` and `resolvedAt` set.
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '/api/donations' -SimpleMatch -Context 3,65 | Select-Object -First 1
+
+  docs\API_DOCUMENTATION.md:38:  "message": "Bad Request",
+  docs\API_DOCUMENTATION.md:39:  "error": "Only recipient organisations can flag an incident",
+  docs\API_DOCUMENTATION.md:40:  "timestamp": "2026-10-06T01:31:48.406447800Z",
+> docs\API_DOCUMENTATION.md:41:  "path": "/api/donations/1/incidents"
+  docs\API_DOCUMENTATION.md:42:}
+  docs\API_DOCUMENTATION.md:43:```
+  docs\API_DOCUMENTATION.md:44:
+  docs\API_DOCUMENTATION.md:45:`error` holds the explanation and is safe to show to users.
+  docs\API_DOCUMENTATION.md:46:
+  docs\API_DOCUMENTATION.md:47:| Situation | Status | `error` text |
+  docs\API_DOCUMENTATION.md:48:|---|---|---|
+  docs\API_DOCUMENTATION.md:49:| Missing or invalid field in a request body | 400 | `description: Desc
+ription is required` |
+  docs\API_DOCUMENTATION.md:50:| Unknown enum value in a request body (e.g. severity `CRITICAL`) | 400
+ | `The request body is malformed or contains an invalid value, such as an unknown severity or categor
+y.` |
+  docs\API_DOCUMENTATION.md:51:| Invalid value in the URL (e.g. `/donations/status/FOO`) | 400 | `Inva
+lid value 'FOO' for parameter 'status'.` |
+  docs\API_DOCUMENTATION.md:52:| Required query parameter missing | 400 | `Required parameter 'donorId
+' is missing.` |
+  docs\API_DOCUMENTATION.md:53:| Business rule broken | 400 | `Recipient organisation must be approved
+ before making reservations` |
+  docs\API_DOCUMENTATION.md:54:| Wrong email or password at login | 401 | `Invalid email or password`
+|
+  docs\API_DOCUMENTATION.md:55:| Record not found | 404 | `Donation not found with ID: 999` |
+  docs\API_DOCUMENTATION.md:56:| Unexpected server error | 500 | varies |
+  docs\API_DOCUMENTATION.md:57:
+  docs\API_DOCUMENTATION.md:58:Business-rule errors that were checked: reserving as an unapproved reci
+pient, a donor flagging an incident, a duplicate email on user creation, a malformed incident-report d
+ate. Not-found checks: unknown donation, incident, user, notification list and dashboard user, all ret
+urning `404`. For the user, notification and dashboard cases only the status code was recorded in test
+ing. From the `UserService` source, a duplicate email says `Email already exists: <email>` and an unkn
+own user says `User not found with ID: <id>` (or `... with email: <email>`).
+  docs\API_DOCUMENTATION.md:59:
+  docs\API_DOCUMENTATION.md:60:**How 404 is chosen:** a plain error message containing "not found" bec
+omes `404`. Any other deliberate error becomes `400`.
+  docs\API_DOCUMENTATION.md:61:
+  docs\API_DOCUMENTATION.md:62:---
+  docs\API_DOCUMENTATION.md:63:
+  docs\API_DOCUMENTATION.md:64:## Login (`/api/auth`) ✅
+  docs\API_DOCUMENTATION.md:65:
+  docs\API_DOCUMENTATION.md:66:| Method | Path | Purpose |
+  docs\API_DOCUMENTATION.md:67:|---|---|---|
+  docs\API_DOCUMENTATION.md:68:| POST | `/api/auth/login` | Check an email and password and return the
+ user |
+  docs\API_DOCUMENTATION.md:69:
+  docs\API_DOCUMENTATION.md:70:**Request**
+  docs\API_DOCUMENTATION.md:71:```json
+  docs\API_DOCUMENTATION.md:72:{
+  docs\API_DOCUMENTATION.md:73:  "email": "donor@test.com",
+  docs\API_DOCUMENTATION.md:74:  "password": "password123"
+  docs\API_DOCUMENTATION.md:75:}
+  docs\API_DOCUMENTATION.md:76:```
+  docs\API_DOCUMENTATION.md:77:Returns `200` with the user, including the role the frontend needs to s
+how the right screens. The password hash is never returned:
+  docs\API_DOCUMENTATION.md:78:```json
+  docs\API_DOCUMENTATION.md:79:{
+  docs\API_DOCUMENTATION.md:80:  "id": 1,
+  docs\API_DOCUMENTATION.md:81:  "fullName": "Test Donor",
+  docs\API_DOCUMENTATION.md:82:  "email": "donor@test.com",
+  docs\API_DOCUMENTATION.md:83:  "role": "DONOR",
+  docs\API_DOCUMENTATION.md:84:  "organisationName": "Test Cafe",
+  docs\API_DOCUMENTATION.md:85:  "phoneNumber": null,
+  docs\API_DOCUMENTATION.md:86:  "address": null,
+  docs\API_DOCUMENTATION.md:87:  "verificationStatus": null,
+  docs\API_DOCUMENTATION.md:88:  "createdAt": "2026-10-06T08:57:37.906630Z"
+  docs\API_DOCUMENTATION.md:89:}
+  docs\API_DOCUMENTATION.md:90:```
+  docs\API_DOCUMENTATION.md:91:- A wrong password and an unknown email both return `401` with the same
+ text, `Invalid email or password`, so the response doesn't reveal which accounts exist.
+  docs\API_DOCUMENTATION.md:92:- A blank email or password returns `400` with a validation message.
+  docs\API_DOCUMENTATION.md:93:- **There is no token.** The frontend keeps the returned user and sends
+ the user id where an endpoint asks for it. This is a stop-gap for the project, not real security (see
+ Known limitations).
+  docs\API_DOCUMENTATION.md:94:
+  docs\API_DOCUMENTATION.md:95:---
+  docs\API_DOCUMENTATION.md:96:
+  docs\API_DOCUMENTATION.md:97:## Users (`/api/users`)
+  docs\API_DOCUMENTATION.md:98:
+  docs\API_DOCUMENTATION.md:99:| Method | Path | Notes |
+  docs\API_DOCUMENTATION.md:100:|---|---|---|
+  docs\API_DOCUMENTATION.md:101:| GET | `/api/users` | ✅ List all users |
+  docs\API_DOCUMENTATION.md:102:| GET | `/api/users/{id}` | ✅ `404` for an unknown id, `400` for a non
+-numeric id. Success path ◻️ |
+  docs\API_DOCUMENTATION.md:103:| GET | `/api/users/email/{email}` | ◻️ |
+  docs\API_DOCUMENTATION.md:104:| POST | `/api/users` | ✅ Create a user. A duplicate email returns `40
+0` |
+  docs\API_DOCUMENTATION.md:105:| PUT | `/api/users/{id}` | ✅ Update a user, including verification |
+  docs\API_DOCUMENTATION.md:106:| DELETE | `/api/users/{id}` | ◻️ |
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-Content .\docs\API_DOCUMENTATION.md | Select-Object -Skip 139 -First 35
+| POST | `/api/donations?donorId={id}` | Create a donation |
+| GET | `/api/donations/status/{status}` | Filter by status |
+| PATCH | `/api/donations/{id}/status?status={STATUS}` | Change status |
+| DELETE | `/api/donations/{id}` | Delete (204) |
+
+**Create a donation**
+```json
+{
+  "title": "Fresh Bread",
+  "description": "Surplus loaves from today",
+  "category": "BAKERY",
+  "quantity": 5,
+  "quantityUnit": "kg",
+  "dietaryInfo": "Contains gluten",
+  "storageInfo": "Store at room temperature",
+  "expiryDateTime": "2026-12-31T18:00:00Z",
+  "collectionDeadline": "2026-12-31T17:00:00Z",
+  "pickupAddress": "123 Market St, Adelaide"
+}
+```
+Required: `title`, `category`, `quantity` (positive), `quantityUnit`, `expiryDateTime`, `collectionDeadline`. Returns `201` with `status: "AVAILABLE"`.
+
+**Automatic expiry.** A background job runs every minute (first run 10 seconds after the app starts). It sets any `AVAILABLE` donation to `EXPIRED` once its `collectionDeadline` has passed. Reserved and collected donations are left alone.
+
+---
+
+## Reservations (`/api/reservations`) 鉁?
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/reservations` | All reservations |
+| GET | `/api/reservations/{id}` | One reservation |
+| GET | `/api/reservations/recipient/{recipientOrgId}` | A recipient org's reservations |
+| POST | `/api/reservations?recipientOrgId={id}` | Create a reservation |
+| GET | `/api/reservations/status/{status}` | Filter by status |
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-Content .\docs\API_DOCUMENTATION.md | Select-Object -Skip 119 -First 21
+```
+Returns `201`. `verificationStatus` is `null` for donors and admins and starts as `PENDING` for `RECIPIENT_ORG`. A duplicate email returns `400`. The API accepts any `role`, including `ADMIN`, so the registration screen should only offer Donor and Recipient organisation.
+
+**Approve a recipient organisation** (required before it can reserve anything)
+```
+PUT /api/users/{id}
+{ "verificationStatus": "APPROVED" }
+```
+The value is `APPROVED`. `VERIFIED` is not valid.
+
+---
+
+## Donations (`/api/donations`) 鉁?
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/donations` | All donations |
+| GET | `/api/donations/{id}` | One donation |
+| GET | `/api/donations/available` | Donations with status `AVAILABLE` |
+| GET | `/api/donations/donor/{donorId}` | One donor's donations |
+| POST | `/api/donations?donorId={id}` | Create a donation |
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '"title"' -SimpleMatch -Context 3,14 | Select-Object -First 1
+
+  docs\API_DOCUMENTATION.md:145:**Create a donation**
+  docs\API_DOCUMENTATION.md:146:```json
+  docs\API_DOCUMENTATION.md:147:{
+> docs\API_DOCUMENTATION.md:148:  "title": "Fresh Bread",
+  docs\API_DOCUMENTATION.md:149:  "description": "Surplus loaves from today",
+  docs\API_DOCUMENTATION.md:150:  "category": "BAKERY",
+  docs\API_DOCUMENTATION.md:151:  "quantity": 5,
+  docs\API_DOCUMENTATION.md:152:  "quantityUnit": "kg",
+  docs\API_DOCUMENTATION.md:153:  "dietaryInfo": "Contains gluten",
+  docs\API_DOCUMENTATION.md:154:  "storageInfo": "Store at room temperature",
+  docs\API_DOCUMENTATION.md:155:  "expiryDateTime": "2026-12-31T18:00:00Z",
+  docs\API_DOCUMENTATION.md:156:  "collectionDeadline": "2026-12-31T17:00:00Z",
+  docs\API_DOCUMENTATION.md:157:  "pickupAddress": "123 Market St, Adelaide"
+  docs\API_DOCUMENTATION.md:158:}
+  docs\API_DOCUMENTATION.md:159:```
+  docs\API_DOCUMENTATION.md:160:Required: `title`, `category`, `quantity` (positive), `quantityUnit`,
+`expiryDateTime`, `collectionDeadline`. Returns `201` with `status: "AVAILABLE"`.
+  docs\API_DOCUMENTATION.md:161:
+  docs\API_DOCUMENTATION.md:162:**Automatic expiry.** A background job runs every minute (first run 10
+ seconds after the app starts). It sets any `AVAILABLE` donation to `EXPIRED` once its `collectionDead
+line` has passed. Reserved and collected donations are left alone.
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    title = "Fresh Bread"
+    description = "Day 3 QA test donation"
+    category = "BAKERY"
+    quantity = 5
+    quantityUnit = "kg"
+    dietaryInfo = "Contains gluten"
+    storageInfo = "Store at room temperature"
+    expiryDateTime = "2026-12-31T18:00:00Z"
+    collectionDeadline = "2026-12-31T17:00:00Z"
+    pickupAddress = "123 Market St, Adelaide"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\create-donation-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/donations?donorId=1" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/create-donation-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-donation.txt
+HTTP/1.1 201
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:02:08 GMT
+
+{"id":1,"donorId":1,"donorName":"Test Donor","title":"Fresh Bread","description":"Day 3 QA test donation","category":"BAKERY","quantity":5.0,"quantityUnit":"kg","dietaryInfo":"Contains gluten","storageInfo":"Store at room temperature","expiryDateTime":"2026-12-31T18:00:00Z","collectionDeadline":"2026-12-31T17:00:00Z","pickupAddress":"123 Market St, Adelaide","status":"AVAILABLE","createdAt":"2026-10-09T04:02:08.574515900Z","updatedAt":"2026-10-09T04:02:08.574515900Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '"donationId"' -SimpleMatch -Context 4,18 | Select-Object -First 1
+
+  docs\API_DOCUMENTATION.md:177:
+  docs\API_DOCUMENTATION.md:178:**Create a reservation**
+  docs\API_DOCUMENTATION.md:179:```json
+  docs\API_DOCUMENTATION.md:180:{
+> docs\API_DOCUMENTATION.md:181:  "donationId": 1,
+  docs\API_DOCUMENTATION.md:182:  "scheduledPickupTime": "2026-12-31T16:00:00Z"
+  docs\API_DOCUMENTATION.md:183:}
+  docs\API_DOCUMENTATION.md:184:```
+  docs\API_DOCUMENTATION.md:185:Returns `201` with `status: "PENDING"`. The request fails with `400` u
+nless all of these hold:
+  docs\API_DOCUMENTATION.md:186:- the user is a `RECIPIENT_ORG`
+  docs\API_DOCUMENTATION.md:187:- that org's `verificationStatus` is `APPROVED`
+  docs\API_DOCUMENTATION.md:188:- the donation's status is `AVAILABLE`
+  docs\API_DOCUMENTATION.md:189:- the donation has no active reservation (one that isn't `CANCELLED`)
+  docs\API_DOCUMENTATION.md:190:
+  docs\API_DOCUMENTATION.md:191:On success the donation's status becomes `RESERVED`.
+  docs\API_DOCUMENTATION.md:192:
+  docs\API_DOCUMENTATION.md:193:**Side effects of status changes**
+  docs\API_DOCUMENTATION.md:194:- Setting a reservation to `COLLECTED` sets the donation to `COLLECTED
+` and records `collectedAt`.
+  docs\API_DOCUMENTATION.md:195:- Setting it to `CANCELLED`, or calling DELETE, sets the donation back
+ to `AVAILABLE`.
+  docs\API_DOCUMENTATION.md:196:
+  docs\API_DOCUMENTATION.md:197:**Re-reserving after a cancellation works** ✅ (fixed 6 Oct 2026). A do
+nation can have several reservation rows over time, for example a cancelled one followed by a new one,
+ but only one active at a time. The second attempt while one is active should return `400` with "Donat
+ion already has an active reservation" (expected from the code, response not yet recorded).
+  docs\API_DOCUMENTATION.md:198:
+  docs\API_DOCUMENTATION.md:199:---
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '"donationId"' -SimpleMatch -Context 2,4 | Select-Object -First 1
+
+  docs\API_DOCUMENTATION.md:179:```json
+  docs\API_DOCUMENTATION.md:180:{
+> docs\API_DOCUMENTATION.md:181:  "donationId": 1,
+  docs\API_DOCUMENTATION.md:182:  "scheduledPickupTime": "2026-12-31T16:00:00Z"
+  docs\API_DOCUMENTATION.md:183:}
+  docs\API_DOCUMENTATION.md:184:```
+  docs\API_DOCUMENTATION.md:185:Returns `201` with `status: "PENDING"`. The request fails with `400` u
+nless all of these hold:
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    donationId = 1
+    scheduledPickupTime = "2026-12-31T16:00:00Z"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\reservation-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/reservations?recipientOrgId=2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/reservation-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\reserve-pending-org.txt
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:05:51 GMT
+Connection: close
+
+{"status":400,"message":"Bad Request","error":"Recipient organisation must be approved before making reservations","timestamp":"2026-10-09T04:05:51.687953800Z","path":"/api/reservations"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    verificationStatus = "APPROVED"
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\approve-recipient-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X PUT "http://localhost:8080/api/users/2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/approve-recipient-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\approve-recipient.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:07:09 GMT
+
+{"id":2,"fullName":"Test Recipient","email":"recipient@test.com","role":"RECIPIENT_ORG","organisationName":"Test Charity","phoneNumber":"08 1234 5679","address":"456 Main St","verificationStatus":"APPROVED","createdAt":"2026-10-09T03:49:47.528681Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/notifications/user/2/unread" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\approval-notification.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:08:59 GMT
+
+[{"id":1,"recipientUserId":2,"recipientUserName":"Test Recipient","type":"RECIPIENT_ORG_VERIFIED","message":"Your organisation has been approved. You can now reserve donations.","relatedDonationId":null,"createdAt":"2026-10-09T04:07:09.316604Z","read":false}]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/reservations?recipientOrgId=2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/reservation-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\reserve-approved-org.txt
+HTTP/1.1 201
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:10:09 GMT
+
+{"id":1,"donationId":1,"donationTitle":"Fresh Bread","recipientOrgId":2,"recipientOrgName":"Test Recipient","status":"PENDING","scheduledPickupTime":"2026-12-31T16:00:00Z","reservedAt":"2026-10-09T04:10:09.563684200Z","collectedAt":null}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/donations/1" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\donation-after-reserve.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:11:54 GMT
+
+{"id":1,"donorId":1,"donorName":"Test Donor","title":"Fresh Bread","description":"Day 3 QA test donation","category":"BAKERY","quantity":5.0,"quantityUnit":"kg","dietaryInfo":"Contains gluten","storageInfo":"Store at room temperature","expiryDateTime":"2026-12-31T18:00:00Z","collectionDeadline":"2026-12-31T17:00:00Z","pickupAddress":"123 Market St, Adelaide","status":"RESERVED","createdAt":"2026-10-09T04:02:08.574516Z","updatedAt":"2026-10-09T04:10:09.566144Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/reservations?recipientOrgId=2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/reservation-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\reserve-duplicate.txt
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:12:34 GMT
+Connection: close
+
+{"status":400,"message":"Bad Request","error":"Donation is not available for reservation. Current status: RESERVED","timestamp":"2026-10-09T04:12:34.204802300Z","path":"/api/reservations"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/notifications/user/1/unread" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\reservation-donor-notification.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:13:54 GMT
+
+[{"id":2,"recipientUserId":1,"recipientUserName":"Test Donor","type":"RESERVATION_CONFIRMED","message":"Test Charity reserved \"Fresh Bread\" for pickup.","relatedDonationId":1,"createdAt":"2026-10-09T04:10:09.565632Z","read":false}]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '| PUT |','| PATCH |' -SimpleMatch | Where-Object { $_.Line -like '*reservations*' }
+
+docs\API_DOCUMENTATION.md:175:| PATCH | `/api/reservations/{id}/status?status={STATUS}` | Change statu
+s |
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X PATCH "http://localhost:8080/api/reservations/1/status?status=CANCELLED" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\cancel-reservation.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:15:46 GMT
+
+{"id":1,"donationId":1,"donationTitle":"Fresh Bread","recipientOrgId":2,"recipientOrgName":"Test Recipient","status":"CANCELLED","scheduledPickupTime":"2026-12-31T16:00:00Z","reservedAt":"2026-10-09T04:10:09.563684Z","collectedAt":null}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/donations/1" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\donation-after-cancel.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:17:29 GMT
+
+{"id":1,"donorId":1,"donorName":"Test Donor","title":"Fresh Bread","description":"Day 3 QA test donation","category":"BAKERY","quantity":5.0,"quantityUnit":"kg","dietaryInfo":"Contains gluten","storageInfo":"Store at room temperature","expiryDateTime":"2026-12-31T18:00:00Z","collectionDeadline":"2026-12-31T17:00:00Z","pickupAddress":"123 Market St, Adelaide","status":"AVAILABLE","createdAt":"2026-10-09T04:02:08.574516Z","updatedAt":"2026-10-09T04:15:46.351834Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/reservations?recipientOrgId=2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/reservation-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\reserve-after-cancel.txt
+HTTP/1.1 201
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:19:07 GMT
+
+{"id":2,"donationId":1,"donationTitle":"Fresh Bread","recipientOrgId":2,"recipientOrgName":"Test Recipient","status":"PENDING","scheduledPickupTime":"2026-12-31T16:00:00Z","reservedAt":"2026-10-09T04:19:07.588397400Z","collectedAt":null}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X PATCH "http://localhost:8080/api/reservations/2/status?status=COLLECTED" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\collect-reservation.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:20:39 GMT
+
+{"id":2,"donationId":1,"donationTitle":"Fresh Bread","recipientOrgId":2,"recipientOrgName":"Test Recipient","status":"COLLECTED","scheduledPickupTime":"2026-12-31T16:00:00Z","reservedAt":"2026-10-09T04:19:07.588397Z","collectedAt":"2026-10-09T04:20:39.706447700Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/donations/1" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\donation-after-collect.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:21:29 GMT
+
+{"id":1,"donorId":1,"donorName":"Test Donor","title":"Fresh Bread","description":"Day 3 QA test donation","category":"BAKERY","quantity":5.0,"quantityUnit":"kg","dietaryInfo":"Contains gluten","storageInfo":"Store at room temperature","expiryDateTime":"2026-12-31T18:00:00Z","collectionDeadline":"2026-12-31T17:00:00Z","pickupAddress":"123 Market St, Adelaide","status":"COLLECTED","createdAt":"2026-10-09T04:02:08.574516Z","updatedAt":"2026-10-09T04:20:39.707748Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/notifications/user/1/unread" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\collection-donor-notification.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:22:41 GMT
+
+[{"id":4,"recipientUserId":1,"recipientUserName":"Test Donor","type":"DONATION_COLLECTED","message":"\"Fresh Bread\" was collected by Test Charity.","relatedDonationId":1,"createdAt":"2026-10-09T04:20:39.707748Z","read":false},{"id":3,"recipientUserId":1,"recipientUserName":"Test Donor","type":"RESERVATION_CONFIRMED","message":"Test Charity reserved \"Fresh Bread\" for pickup.","relatedDonationId":1,"createdAt":"2026-10-09T04:19:07.589896Z","read":false},{"id":2,"recipientUserId":1,"recipientUserName":"Test Donor","type":"RESERVATION_CONFIRMED","message":"Test Charity reserved \"Fresh Bread\" for pickup.","relatedDonationId":1,"createdAt":"2026-10-09T04:10:09.565632Z","read":false}]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern 'POST /api/incidents' -SimpleMatch -Context 3,30 | Select-Object -First 1
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '/api/incidents' -SimpleMatch -Context 2,12 | Select-Object -First 3
+
+  docs\API_DOCUMENTATION.md:207:| POST | `/api/donations/{donationId}/incidents?reportedByUserId={id}`
+ | Flag an incident |
+  docs\API_DOCUMENTATION.md:208:| GET | `/api/donations/{donationId}/incidents` | Incidents for one do
+nation |
+> docs\API_DOCUMENTATION.md:209:| GET | `/api/incidents` | All incidents, newest first |
+> docs\API_DOCUMENTATION.md:210:| GET | `/api/incidents/{id}` | One incident (`404` if missing) |
+> docs\API_DOCUMENTATION.md:211:| GET | `/api/incidents/status/{status}` | Filter by `OPEN`, `UNDER_RE
+VIEW` or `RESOLVED` |
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '"severity"' -SimpleMatch -Context 8,4 | Select-Object -First 1
+
+  docs\API_DOCUMENTATION.md:212:| PATCH | `/api/incidents/{id}/status?status={STATUS}` | Change status
+, e.g. to `UNDER_REVIEW` |
+  docs\API_DOCUMENTATION.md:213:| PATCH | `/api/incidents/{id}/resolve` | Resolve with notes |
+  docs\API_DOCUMENTATION.md:214:| GET | `/api/incidents/report?from={instant}&to={instant}` | Summary
+for a date range |
+  docs\API_DOCUMENTATION.md:215:
+  docs\API_DOCUMENTATION.md:216:**Flag an incident** (the reporter must have role `RECIPIENT_ORG`, oth
+erwise `400`)
+  docs\API_DOCUMENTATION.md:217:```json
+  docs\API_DOCUMENTATION.md:218:{
+  docs\API_DOCUMENTATION.md:219:  "description": "Verbal use-by date did not match the date printed on
+ the stock",
+> docs\API_DOCUMENTATION.md:220:  "severity": "SEVERE"
+  docs\API_DOCUMENTATION.md:221:}
+  docs\API_DOCUMENTATION.md:222:```
+  docs\API_DOCUMENTATION.md:223:Returns `201`:
+  docs\API_DOCUMENTATION.md:224:```json
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    description = "Day 3 QA test: use-by date did not match the label"
+    severity = "SEVERE"
+} | ConvertTo-Json | Set-Content -Path .\docs\test-evidence\2026-10-09\create-incident-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/donations/1/incidents?reportedByUserId=2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/create-incident-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-incident.txt
+HTTP/1.1 400
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:31:14 GMT
+Connection: close
+
+{"status":400,"message":"Invalid request body","error":"The request body is malformed or contains an invalid value, such as an unknown severity or category.","timestamp":"2026-10-09T04:31:14.381763900Z","path":"/api/donations/1/incidents"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-Content .\docs\test-evidence\2026-10-09\create-incident-request.json
+{
+    "description":  "Day 3 QA test: use-by date did not match the label",
+    "severity":  "SEVERE"
+}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-ChildItem .\src -Recurse -Filter '*Severity*.java' | ForEach-Object {
+    $_.FullName
+    Get-Content $_.FullName
+}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-ChildItem .\src -Recurse -Filter '*.java' | Select-String -Pattern 'enum.*Severity|SEVERE|severity' -Context 2,5 | Select-Object -First 5
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git ls-files | Select-String -Pattern 'Incident|Severity|pom.xml'
+
+food-rescue-backend/pom.xml
+food-rescue-backend/src/main/java/com/foodrescue/backend/controller/DonationIncidentController.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/dto/AddIncidentNoteRequest.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/dto/CreateIncidentRequest.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/dto/DonationIncidentDTO.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/dto/IncidentReportDTO.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/dto/ResolveIncidentRequest.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/model/DonationIncident.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/model/IncidentSeverity.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/model/IncidentStatus.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/repository/DonationIncidentRepository.java
+food-rescue-backend/src/main/java/com/foodrescue/backend/service/DonationIncidentService.java
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-Content .\food-rescue-backend\src\main\java\com\foodrescue\backend\model\IncidentSeverity.java
+package com.foodrescue.backend.model;
+
+public enum IncidentSeverity {
+    LOW,
+    MEDIUM,
+    HIGH
+}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-Content .\food-rescue-backend\src\main\java\com\foodrescue\backend\dto\CreateIncidentRequest.java
+package com.foodrescue.backend.dto;
+
+import com.foodrescue.backend.model.IncidentSeverity;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Request payload for flagging a food-safety/quality incident against a donation.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreateIncidentRequest {
+
+    @NotBlank(message = "Description is required")
+    @Size(max = 1000, message = "Description must be 1000 characters or fewer")
+    private String description;
+
+    @NotNull(message = "Severity is required")
+    private IncidentSeverity severity;
+
+    @Size(max = 100, message = "Role must be 100 characters or fewer")
+    private String reporterRole;
+
+    @Size(max = 1000, message = "Notes must be 1000 characters or fewer")
+    private String additionalNotes;
+}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-Content .\food-rescue-backend\src\main\java\com\foodrescue\backend\model\IncidentSeverity.java
+package com.foodrescue.backend.model;
+
+public enum IncidentSeverity {
+    LOW,
+    MEDIUM,
+    HIGH
+}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    description = "Day 3 QA test: use-by date did not match the label"
+    severity = "HIGH"
+} | ConvertTo-Json | Set-Content -Path .\docs\test-evidence\2026-10-09\create-incident-high-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/donations/1/incidents?reportedByUserId=2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/create-incident-high-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-incident-high.txt
+HTTP/1.1 201
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:39:39 GMT
+
+{"id":1,"donationId":1,"donationTitle":"Fresh Bread","donationDescription":"Day 3 QA test donation","donorId":1,"donorName":"Test Donor","donorOrganisation":"Test Cafe","reportedById":2,"reportedByName":"Test Recipient","reportedByOrganisation":"Test Charity","reporterRole":null,"description":"Day 3 QA test: use-by date did not match the label","additionalNotes":null,"severity":"HIGH","status":"OPEN","reportedAt":"2026-10-09T04:39:39.640728600Z","resolvedAt":null,"resolutionNotes":null,"donorFollowUp":null,"adminNotes":null}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/notifications/user/1/unread" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\incident-donor-notification.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:42:04 GMT
+
+[{"id":4,"recipientUserId":1,"recipientUserName":"Test Donor","type":"DONATION_COLLECTED","message":"\"Fresh Bread\" was collected by Test Charity.","relatedDonationId":1,"createdAt":"2026-10-09T04:20:39.707748Z","read":false},{"id":3,"recipientUserId":1,"recipientUserName":"Test Donor","type":"RESERVATION_CONFIRMED","message":"Test Charity reserved \"Fresh Bread\" for pickup.","relatedDonationId":1,"createdAt":"2026-10-09T04:19:07.589896Z","read":false},{"id":2,"recipientUserId":1,"recipientUserName":"Test Donor","type":"RESERVATION_CONFIRMED","message":"Test Charity reserved \"Fresh Bread\" for pickup.","relatedDonationId":1,"createdAt":"2026-10-09T04:10:09.565632Z","read":false}]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java -Pattern 'notif' -Context 4,10
+
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:34:
+ private final DonationIncidentRepository incidentRepository;
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:35:
+ private final DonationRepository donationRepository;
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:36:
+ private final UserRepository userRepository;
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:37:
+ private final ReservationRepository reservationRepository;
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:38:
+ private final NotificationService notificationService;
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:39:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:40:
+ /**
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:41:
+  * Get all incidents (admin dashboard default view), most recent first.
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:42:
+  */
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:43:
+ public List<DonationIncidentDTO> getAllIncidents() {
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:44:
+     return incidentRepository.findAllByOrderByReportedAtDesc().stream()
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:45:
+             .map(this::toDTO)
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:46:
+             .collect(Collectors.toList());
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:47:
+ }
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:48:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:108:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:109:
+      DonationIncident saved = incidentRepository.save(incident);
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:110:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:111:
+      // Tell every administrator
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:112:
+      notificationService.notifyAdmins(
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:113:
+              Notification.NotificationType.INCIDENT_FLAGGED,
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:114:
+              notificationService.displayName(reportedBy) + " flagged a "
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:115:
+                      + request.getSeverity().name().toLowerCase() + "-severity problem with \""
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:116:
+                      + donation.getTitle() + "\".",
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:117:
+              donation.getId());
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:118:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:119:
+      return toDTO(saved);
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:120:
+  }
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:121:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:122:
+  /**
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:123:
+   * Admin marks an incident as resolved. A resolution note is required, and the
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:124:
+   * resolution date defaults to now but can be confirmed or changed.
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:144:
+      incident.setDonorFollowUp(blankToNull(request.getDonorFollowUp()));
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:145:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:146:
+      DonationIncident updated = incidentRepository.save(incident);
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:147:
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:148:
+      notifyReporterResolved(updated);
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:149:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:150:
+      return toDTO(updated);
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:151:
+  }
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:152:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:153:
+  /**
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:154:
+   * Admin updates an incident's status, for example moving it to UNDER_REVIEW.
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:155:
+   * Resolving goes through resolveIncident, and a resolved incident can't be changed.
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:156:
+   */
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:157:
+  public DonationIncidentDTO updateIncidentStatus(Long id, IncidentStatus newStatus) {
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:158:
+      DonationIncident incident = findEntity(id);
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:208:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:209:
+  /**
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:210:
+   * Tell the organisation that flagged an incident that it has been resolved.
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:211:
+   */
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:212:
+  private void notifyReporterResolved(DonationIncident incident) {
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:213:
+      notificationService.notifyUser(
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:214:
+              incident.getReportedBy(),
+> food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:215:
+              Notification.NotificationType.INCIDENT_RESOLVED,
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:216:
+              "Your report about \"" + incident.getDonation().getTitle() + "\" has been resolved.",
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:217:
+              incident.getDonation().getId());
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:218:
+  }
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:219:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:220:
+  private DonationIncident findEntity(Long id) {
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:221:
+      return incidentRepository.findById(id)
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:222:
+              .orElseThrow(() -> new RuntimeException("Incident not found with ID: " + id));
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:223:
+  }
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:224:
+  food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java:225:
+  private String blankToNull(String text) {
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\food-rescue-backend\src\main\java\com\foodrescue\backend\service\DonationIncidentService.java -Pattern 'INCIDENT_FLAGGED' -Context 6,6 | ForEach-Object { $_.Context.PreContext; $_.Line; $_.Context.PostContext }
+        // status defaults to OPEN and reportedAt is set via @PrePersist
+
+        DonationIncident saved = incidentRepository.save(incident);
+
+        // Tell every administrator
+        notificationService.notifyAdmins(
+                Notification.NotificationType.INCIDENT_FLAGGED,
+                notificationService.displayName(reportedBy) + " flagged a "
+                        + request.getSeverity().name().toLowerCase() + "-severity problem with \""
+                        + donation.getTitle() + "\".",
+                donation.getId());
+
+        return toDTO(saved);
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS "http://localhost:8080/api/users" | ConvertFrom-Json | Format-Table id,fullName,role
+
+id fullName       role
+-- --------       ----
+ 1 Test Donor     DONOR
+ 2 Test Recipient RECIPIENT_ORG
+
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    fullName = "Test Admin"
+    email = "admin@test.com"
+    password = "password123"
+    role = "ADMIN"
+    organisationName = "QA Team"
+    phoneNumber = "08 1234 5680"
+    address = "789 Main St"
+} | ConvertTo-Json | Set-Content -Path .\docs\test-evidence\2026-10-09\create-admin-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/users" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/create-admin-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-admin.txt
+HTTP/1.1 201
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:48:58 GMT
+
+{"id":3,"fullName":"Test Admin","email":"admin@test.com","role":"ADMIN","organisationName":"QA Team","phoneNumber":"08 1234 5680","address":"789 Main St","verificationStatus":null,"createdAt":"2026-10-09T04:48:58.201649900Z"}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X POST "http://localhost:8080/api/donations/1/incidents?reportedByUserId=2" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/create-incident-high-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-incident-with-admin.txt
+HTTP/1.1 201
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:50:31 GMT
+
+{"id":2,"donationId":1,"donationTitle":"Fresh Bread","donationDescription":"Day 3 QA test donation","donorId":1,"donorName":"Test Donor","donorOrganisation":"Test Cafe","reportedById":2,"reportedByName":"Test Recipient","reportedByOrganisation":"Test Charity","reporterRole":null,"description":"Day 3 QA test: use-by date did not match the label","additionalNotes":null,"severity":"HIGH","status":"OPEN","reportedAt":"2026-10-09T04:50:31.491595400Z","resolvedAt":null,"resolutionNotes":null,"donorFollowUp":null,"adminNotes":null}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/notifications/user/3/unread" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\incident-admin-notification.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:52:32 GMT
+
+[{"id":5,"recipientUserId":3,"recipientUserName":"Test Admin","type":"INCIDENT_FLAGGED","message":"Test Charity flagged a high-severity problem with \"Fresh Bread\".","relatedDonationId":1,"createdAt":"2026-10-09T04:50:31.493096Z","read":false}]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X PATCH "http://localhost:8080/api/incidents/2/status?status=UNDER_REVIEW" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\incident-under-review.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:54:13 GMT
+
+{"id":2,"donationId":1,"donationTitle":"Fresh Bread","donationDescription":"Day 3 QA test donation","donorId":1,"donorName":"Test Donor","donorOrganisation":"Test Cafe","reportedById":2,"reportedByName":"Test Recipient","reportedByOrganisation":"Test Charity","reporterRole":null,"description":"Day 3 QA test: use-by date did not match the label","additionalNotes":null,"severity":"HIGH","status":"UNDER_REVIEW","reportedAt":"2026-10-09T04:50:31.491595Z","resolvedAt":null,"resolutionNotes":null,"donorFollowUp":null,"adminNotes":null}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@{
+    resolutionNotes = "Donor contacted and the date check added to the collection process."
+} | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\resolve-incident-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i -X PATCH "http://localhost:8080/api/incidents/2/resolve" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/resolve-incident-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\resolve-incident.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:55:35 GMT
+
+{"id":2,"donationId":1,"donationTitle":"Fresh Bread","donationDescription":"Day 3 QA test donation","donorId":1,"donorName":"Test Donor","donorOrganisation":"Test Cafe","reportedById":2,"reportedByName":"Test Recipient","reportedByOrganisation":"Test Charity","reporterRole":null,"description":"Day 3 QA test: use-by date did not match the label","additionalNotes":null,"severity":"HIGH","status":"RESOLVED","reportedAt":"2026-10-09T04:50:31.491595Z","resolvedAt":"2026-10-09T04:55:35.630800600Z","resolutionNotes":"Donor contacted and the date check added to the collection process.","donorFollowUp":null,"adminNotes":null}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/notifications/user/2/unread" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\incident-resolved-notification.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 04:56:15 GMT
+
+[{"id":6,"recipientUserId":2,"recipientUserName":"Test Recipient","type":"INCIDENT_RESOLVED","message":"Your report about \"Fresh Bread\" has been resolved.","relatedDonationId":1,"createdAt":"2026-10-09T04:55:35.631302Z","read":false},{"id":1,"recipientUserId":2,"recipientUserName":"Test Recipient","type":"RECIPIENT_ORG_VERIFIED","message":"Your organisation has been approved. You can now reserve donations.","relatedDonationId":null,"createdAt":"2026-10-09T04:07:09.316604Z","read":false}]
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Select-String -Path .\docs\API_DOCUMENTATION.md -Pattern '/api/dashboard' -Context 2,6 | ForEach-Object { $_.Context.PreContext; $_.Line; $_.Context.PostContext }
+---
+
+## Dashboard (`/api/dashboard`) ✅
+
+### Overall statistics
+`GET /api/dashboard/stats`
+
+```json
+{
+
+### Overall statistics
+`GET /api/dashboard/stats`
+
+```json
+{
+  "totalDonations": 2,
+  "activeDonations": 1,
+  "totalReservations": 2,
+
+### User statistics
+`GET /api/dashboard/user/{userId}/stats` returns `200` for a donor and for a recipient org, and `404` for an unknown user. From the source, the fields are:
+- Donor: `totalDonations`, `donationsByStatus`, `totalQuantityDonated`, `unreadNotifications`
+- Recipient org: `totalReservations`, `reservationsByStatus`, `completedReservations`, `totalQuantityReceived`, `unreadNotifications`
+- Admin: `unreadNotifications` only
+
+---
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -i "http://localhost:8080/api/dashboard/stats" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\dashboard-stats.txt
+HTTP/1.1 200
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Fri, 09 Oct 2026 05:02:43 GMT
+
+{"totalDonations":1,"activeDonations":0,"totalReservations":2,"completedReservations":1,"totalUsers":3,"verifiedRecipients":1,"pendingVerifications":0,"donationsByStatus":{"COLLECTED":1},"donationsByCategory":{"BAKERY":1},"unreadNotifications":6,"totalIncidents":2,"unresolvedIncidents":1,"incidentsByStatus":{"RESOLVED":1,"OPEN":1},"incidentsBySeverity":{"HIGH":2}}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>foreach ($qaUserId in @(1, 2, 3, 999999)) {
+    Write-Output "===== User $qaUserId ====="
+    curl.exe -sS -w "\nHTTP_STATUS: %{http_code}\n" "http://localhost:8080/api/dashboard/user/$qaUserId/stats" | Tee-Object -FilePath ".\docs\test-evidence\2026-10-09\dashboard-user-$qaUserId.txt"
+}
+===== User 1 =====
+{"unreadNotifications":3,"totalDonations":1,"donationsByStatus":{"COLLECTED":1},"totalQuantityDonated":5}
+HTTP_STATUS: 200
+===== User 2 =====
+{"unreadNotifications":2,"completedReservations":1,"totalQuantityReceived":5,"totalReservations":2,"reservationsByStatus":{"COLLECTED":1,"CANCELLED":1}}
+HTTP_STATUS: 200
+===== User 3 =====
+{"unreadNotifications":1}
+HTTP_STATUS: 200
+===== User 999999 =====
+{"status":404,"message":"Not Found","error":"User not found with ID: 999999","timestamp":"2026-10-09T05:04:21.127445600Z","path":"/api/dashboard/user/999999/stats"}
+HTTP_STATUS: 404
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$qaExpiryDonation = Get-Content .\docs\test-evidence\2026-10-09\create-donation-request.json -Raw | ConvertFrom-Json
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$qaExpiryDonation.title = "Day 3 automatic expiry test"
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$qaExpiryDonation.collectionDeadline = [DateTime]::UtcNow.AddMinutes(1).ToString("yyyy-MM-ddTHH:mm:ssZ")
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$qaExpiryDonation.expiryDate = [DateTime]::UtcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ")
+设置“expiryDate”时发生异常:“在此对象上找不到属性“expiryDate”。请确认该属性存在并且可设置。”
+所在位置 行:1 字符: 1
++ $qaExpiryDonation.expiryDate = [DateTime]::UtcNow.AddDays(1).ToString ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], SetValueInvocationException
+    + FullyQualifiedErrorId : ExceptionWhenSetting
+设置“expiryDate”时发生异常:“在此对象上找不到属性“expiryDate”。请确认该属性存在并且可设置。”
+所在位置 行:1 字符: 1
++ $qaExpiryDonation.expiryDate = [DateTime]::UtcNow.AddDays(1).ToString ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [], SetValueInvocationException
+    + FullyQualifiedErrorId : ExceptionWhenSetting
+
+]633;D;1]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>$qaExpiryDonation | ConvertTo-Json | Set-Content .\docs\test-evidence\2026-10-09\create-expiry-donation-request.json -Encoding ASCII
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -w "\nHTTP_STATUS: %{http_code}\n" -X POST "http://localhost:8080/api/donations?donorId=1" -H "Content-Type: application/json" --data-binary "@docs/test-evidence/2026-10-09/create-expiry-donation-request.json" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\create-expiry-donation.txt
+{"id":2,"donorId":1,"donorName":"Test Donor","title":"Day 3 automatic expiry test","description":"Day 3 QA test donation","category":"BAKERY","quantity":5.0,"quantityUnit":"kg","dietaryInfo":"Contains gluten","storageInfo":"Store at room temperature","expiryDateTime":"2026-12-31T18:00:00Z","collectionDeadline":"2026-10-09T05:07:40Z","pickupAddress":"123 Market St, Adelaide","status":"AVAILABLE","createdAt":"2026-10-09T05:06:40.953173100Z","updatedAt":"2026-10-09T05:06:40.953173100Z"}
+HTTP_STATUS: 201
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -w "\nHTTP_STATUS: %{http_code}\n" "http://localhost:8080/api/donations/2" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\donation-after-auto-expiry.txt
+{"id":2,"donorId":1,"donorName":"Test Donor","title":"Day 3 automatic expiry test","description":"Day 3 QA test donation","category":"BAKERY","quantity":5.0,"quantityUnit":"kg","dietaryInfo":"Contains gluten","storageInfo":"Store at room temperature","expiryDateTime":"2026-12-31T18:00:00Z","collectionDeadline":"2026-10-09T05:07:40Z","pickupAddress":"123 Market St, Adelaide","status":"AVAILABLE","createdAt":"2026-10-09T05:06:40.953173Z","updatedAt":"2026-10-09T05:06:40.953173Z"}
+HTTP_STATUS: 200
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>curl.exe -sS -w "\nHTTP_STATUS: %{http_code}\n" "http://localhost:8080/api/donations/2" | Tee-Object -FilePath .\docs\test-evidence\2026-10-09\donation-after-auto-expiry-recheck.txt
+{"id":2,"donorId":1,"donorName":"Test Donor","title":"Day 3 automatic expiry test","description":"Day 3 QA test donation","category":"BAKERY","quantity":5.0,"quantityUnit":"kg","dietaryInfo":"Contains gluten","storageInfo":"Store at room temperature","expiryDateTime":"2026-12-31T18:00:00Z","collectionDeadline":"2026-10-09T05:07:40Z","pickupAddress":"123 Market St, Adelaide","status":"EXPIRED","createdAt":"2026-10-09T05:06:40.953173Z","updatedAt":"2026-10-09T05:08:21.595966Z"}
+HTTP_STATUS: 200
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git branch --show-current
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git status --short
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Get-ChildItem .\docs\test-evidence\2026-10-09 -File | Select-Object -ExpandProperty Name
+approval-notification.txt
+approve-recipient-request.json
+approve-recipient.txt
+backend-test-log-132522.txt
+cancel-reservation.txt
+collect-reservation.txt
+collection-donor-notification.txt
+create-admin-request.json
+create-admin.txt
+create-donation-request.json
+create-donation.txt
+create-donor.txt
+create-expiry-donation-request.json
+create-expiry-donation.txt
+create-incident-high-request.json
+create-incident-high.txt
+create-incident-request.json
+create-incident-with-admin.txt
+create-incident.txt
+create-recipient-request.json
+create-recipient.txt
+create-user-duplicate-email.txt
+dashboard-stats.txt
+dashboard-user-1.txt
+dashboard-user-2.txt
+dashboard-user-3.txt
+dashboard-user-999999.txt
+donation-after-auto-expiry-recheck.txt
+donation-after-auto-expiry.txt
+donation-after-cancel.txt
+donation-after-collect.txt
+donation-after-reserve.txt
+duplicate-user-request.json
+get-user-1.txt
+get-user-invalid-id.txt
+get-user-not-found.txt
+incident-admin-notification.txt
+incident-donor-notification.txt
+incident-resolved-notification.txt
+incident-under-review.txt
+login-blank-email-request.json
+login-blank-email.txt
+login-blank-password-request.json
+login-blank-password.txt
+login-unknown-email-request.json
+login-unknown-email.txt
+login-valid-request.json
+login-valid.txt
+login-wrong-password-request.json
+login-wrong-password.txt
+pending-verifications.txt
+reservation-donor-notification.txt
+reservation-request.json
+reserve-after-cancel.txt
+reserve-approved-org.txt
+reserve-duplicate.txt
+reserve-pending-org.txt
+resolve-incident-request.json
+resolve-incident.txt
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>@'
+# Day 3 Backend QA Report — 2026-10-09
+
+Tester: Haoxuan Liu
+Backend commit tested: a63315a7d3632729f4815a93f962c21630562826
+Environment: localhost:8080
+Evidence folder: test-evidence/2026-10-09/
+
+## Verified results
+
+| Area | Test | Actual result | Outcome |
+|---|---|---|---|
+| Health | Backend health check | UP | PASS |
+| Users | Create donor, recipient and admin | 201 | PASS |
+| Users | List users and retrieve existing user | 200 | PASS |
+| Users | Unknown user | 404 | PASS |
+| Users | Invalid user ID | 400 | PASS |
+| Users | Duplicate email | 400 | PASS |
+| Login | Valid credentials | 200; user and role returned | PASS |
+| Login | Wrong password or unknown email | 401 | PASS |
+| Login | Blank email or password | 400 | PASS |
+| Verification | List pending organisations | Pending recipient returned | PASS |
+| Verification | Approve recipient organisation | 200; APPROVED | PASS |
+| Notifications | Organisation approval | RECIPIENT_ORG_VERIFIED | PASS |
+| Donations | Create donation | 201; AVAILABLE | PASS |
+| Reservations | Unapproved organisation reserves | 400 | PASS |
+| Reservations | Approved organisation reserves | 201; donation RESERVED | PASS |
+| Reservations | Duplicate active reservation | 400 | PASS; message differs from docs |
+| Notifications | Reservation created | RESERVATION_CONFIRMED to donor | PASS |
+| Reservations | Cancel reservation | 200; donation AVAILABLE | PASS |
+| Reservations | Reserve again after cancellation | 201 | PASS |
+| Reservations | Collect reservation | 200; collectedAt populated; donation COLLECTED | PASS |
+| Notifications | Donation collected | DONATION_COLLECTED to donor | PASS |
+| Incidents | Create HIGH severity incident | 201; OPEN | PASS |
+| Incidents | Donor details included | donorId, donorName, donorOrganisation present | PASS |
+| Notifications | Flag incident with admin present | INCIDENT_FLAGGED to admin | PASS |
+| Incidents | Set UNDER_REVIEW | 200; UNDER_REVIEW | PASS |
+| Incidents | Resolve incident | 200; RESOLVED; resolvedAt and notes populated | PASS |
+| Notifications | Resolve incident | INCIDENT_RESOLVED to reporter | PASS |
+| Dashboard | Overall statistics | 200; counts matched test data | PASS |
+| Dashboard | Donor, recipient and admin statistics | 200; role-specific counts matched | PASS |
+| Dashboard | Unknown user statistics | 404 | PASS |
+| Expiry | Donation passes collection deadline | Automatically changed AVAILABLE to EXPIRED | PASS |
+
+## Documentation discrepancies
+
+1. Incident severity example uses SEVERE, but the implementation accepts LOW, MEDIUM and HIGH.
+   - SEVERE request returned 400.
+   - HIGH request returned 201.
+   - Evidence: create-incident.txt and create-incident-high.txt.
+   - Recommended correction: update the documented example and allowed values.
+
+2. Duplicate reservation error text differs from the documentation.
+   - Actual: Donation is not available for reservation. Current status: RESERVED
+   - Documented: Donation already has an active reservation
+   - Both describe a rejected duplicate reservation; functional behaviour passed.
+   - Evidence: reserve-duplicate.txt.
+   - Recommended correction: align documented error text with the implementation.
+
+## Test notes
+
+- Incident 1 was created before an admin existed. Incident 2 was created after admin user 3 existed to verify admin notification delivery.
+- Automatic expiry test: donation 2 had collectionDeadline 2026-10-09T05:07:40Z.
+- It became EXPIRED at 2026-10-09T05:08:21.595966Z, about 42 seconds after the deadline.
+- An earlier expiry check still showed AVAILABLE before the scheduled scan; both checks are retained.
+- The PowerShell setup used expiryDate by mistake; that assignment failed. The existing expiryDateTime remained 2026-12-31T18:00:00Z. Creation succeeded and the collectionDeadline-based expiry test remained valid.
+- This report covers the manual API tests above; it does not claim full endpoint, frontend or automated test coverage.
+
+## Conclusion
+
+The tested backend flows passed. Two documentation discrepancies require follow-up.
+'@ | Set-Content .\docs\Day-3-QA-Report-2026-10-09.md -Encoding UTF8
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+]633;D]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git branch --show-current
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git status --short
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git add -- docs/Day-3-QA-Report-2026-10-09.md docs/test-evidence/2026-10-09/
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git commit -m "Add Day 3 backend QA report and test evidence"
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git push -u origin qa/2026-10-09-backend-tests
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>git status --short
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cTommy\x5cDesktop\x5cfood-rescue-backend-main\x5cfood-rescue-backend\x5cfood-rescue-backendPS C:\Users\Tommy\Desktop\food-rescue-backend-main\food-rescue-backend\food-rescue-backend> ]633;B
+PS>Stop-Transcript
+**********************
+Windows PowerShell 脚本结束
+结束时间: 20261009154607
+**********************
