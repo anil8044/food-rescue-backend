@@ -8,6 +8,7 @@ import PermissionNotice from './components/PermissionNotice'
 import BrowseDonationsPage from './pages/BrowseDonationsPage'
 import RoleBoundary from './auth/RoleBoundary'
 import DonorPage from './pages/DonorPage'
+import AdminDashboard from './pages/AdminDashboard'
 
 export default function App() {
   return (
@@ -20,7 +21,9 @@ export default function App() {
 <Route element={<RoleBoundary role="DONOR" />}>
   <Route path="donor/*" element={<DonorPage />} />
 </Route>
-<Route element={<RoleBoundary role="ADMIN" />}><Route path="admin/*" element={<NotFoundPage />} /></Route>
+<Route element={<RoleBoundary role="ADMIN" />}>
+  <Route path="admin" element={<AdminDashboard />} />
+</Route>
 <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="*" element={<NotFoundPage />} />
