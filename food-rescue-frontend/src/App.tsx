@@ -9,6 +9,7 @@ import BrowseDonationsPage from './pages/BrowseDonationsPage'
 import RoleBoundary from './auth/RoleBoundary'
 import DonorPage from './pages/DonorPage'
 import AdminDashboard from './pages/AdminDashboard'
+import RecipientApprovals from './pages/RecipientApprovals'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
 </Route>
 <Route element={<RoleBoundary role="ADMIN" />}>
   <Route path="admin" element={<AdminDashboard />} />
+  <Route path="admin/approvals" element={<RecipientApprovals />} />
 </Route>
 <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />

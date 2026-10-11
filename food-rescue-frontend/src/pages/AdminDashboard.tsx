@@ -8,6 +8,7 @@ import {
   Typography,
 } from '@mui/material'
 import { api } from '../api/client'
+import { Link as RouterLink } from 'react-router-dom'
 
 type DashboardStats = {
   totalDonations: number
@@ -89,13 +90,22 @@ export default function AdminDashboard() {
       </Typography>
 
       <Button
-        variant="outlined"
-        disabled={loading}
-        onClick={() => setRefreshKey(current => current + 1)}
-        sx={{ mb: 3 }}
-      >
-        Refresh statistics
-      </Button>
+  variant="outlined"
+  disabled={loading}
+  onClick={() => setRefreshKey(current => current + 1)}
+  sx={{ mb: 3 }}
+>
+  Refresh statistics
+</Button>
+
+<Button
+  component={RouterLink}
+  to="/admin/approvals"
+  variant="contained"
+  sx={{ ml: 2, mb: 3 }}
+>
+  Review recipient applications
+</Button>
 
       {loading && (
         <Box>
