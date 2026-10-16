@@ -4,5 +4,7 @@ public enum ReservationStatus {
     PENDING,
     CONFIRMED,
     COLLECTED,
-    CANCELLED
+    CANCELLED,
+    /** The recipient never collected the food before the collection deadline (a no-show). */
+    MISSED
 }

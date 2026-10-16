@@ -57,6 +57,7 @@ public class Notification {
         DONATION_COLLECTED,
         RECIPIENT_ORG_VERIFIED,
         INCIDENT_FLAGGED,
-        INCIDENT_RESOLVED
+        INCIDENT_RESOLVED,
+        MISSED_COLLECTION
     }
 }
