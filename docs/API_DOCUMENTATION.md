@@ -19,10 +19,10 @@ All seven controllers (auth, users, donations, reservations, incidents, notifica
 | `verificationStatus` | `PENDING`, `APPROVED`, `REJECTED` |
 | Donation `category` | `FRESH_PRODUCE`, `BAKERY`, `DAIRY`, `MEAT_AND_SEAFOOD`, `PANTRY_AND_DRY_GOODS`, `PREPARED_MEALS`, `BEVERAGES`, `OTHER` |
 | Donation `status` | `AVAILABLE`, `RESERVED`, `COLLECTED`, `EXPIRED`, `CANCELLED` |
-| Reservation `status` | `PENDING`, `CONFIRMED`, `COLLECTED`, `CANCELLED` |
-| Incident `severity` | `MINOR`, `MODERATE`, `SEVERE` |
+| Reservation `status` | `PENDING`, `CONFIRMED`, `COLLECTED`, `CANCELLED`, `MISSED` |
+| Incident `severity` | `LOW`, `MEDIUM`, `HIGH` |
 | Incident `status` | `OPEN`, `UNDER_REVIEW`, `RESOLVED` |
-| Notification `type` | `NEW_DONATION_AVAILABLE`, `RESERVATION_CONFIRMED`, `DONATION_EXPIRING_SOON`, `DONATION_COLLECTED`, `RECIPIENT_ORG_VERIFIED`, `INCIDENT_FLAGGED`, `INCIDENT_RESOLVED` |
+| Notification `type` | `NEW_DONATION_AVAILABLE`, `RESERVATION_CONFIRMED`, `DONATION_EXPIRING_SOON`, `DONATION_COLLECTED`, `RECIPIENT_ORG_VERIFIED`, `INCIDENT_FLAGGED`, `INCIDENT_RESOLVED`, `MISSED_COLLECTION` |
 
 Dates and times are ISO-8601 instants, for example `2026-12-31T18:00:00Z`.
 
@@ -47,7 +47,7 @@ Every controller now passes errors to one central handler, so all endpoints retu
 | Situation | Status | `error` text |
 |---|---|---|
 | Missing or invalid field in a request body | 400 | `description: Description is required` |
-| Unknown enum value in a request body (e.g. severity `CRITICAL`) | 400 | `The request body is malformed or contains an invalid value, such as an unknown severity or category.` |
+| Unknown enum value in a request body (e.g. severity `SEVERE`, which was renamed) | 400 | `The request body is malformed or contains an invalid value, such as an unknown severity or category.` |
 | Invalid value in the URL (e.g. `/donations/status/FOO`) | 400 | `Invalid value 'FOO' for parameter 'status'.` |
 | Required query parameter missing | 400 | `Required parameter 'donorId' is missing.` |
 | Business rule broken | 400 | `Recipient organisation must be approved before making reservations` |
@@ -200,7 +200,7 @@ On success the donation's status becomes `RESERVED`.
 
 ## Incidents ✅ (food-safety flagging)
 
-Added after the host organisation asked for recipient organisations to be able to flag a problem with a donation, and for admins to follow it up.
+Updated 9 Oct 2026 to match the host organisation's written answers (Aradhika Guha). Added after the host organisation asked for recipient organisations to be able to flag a problem with a donation, and for admins to follow it up.
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -210,42 +210,72 @@ Added after the host organisation asked for recipient organisations to be able t
 | GET | `/api/incidents/{id}` | One incident (`404` if missing) |
 | GET | `/api/incidents/status/{status}` | Filter by `OPEN`, `UNDER_REVIEW` or `RESOLVED` |
 | PATCH | `/api/incidents/{id}/status?status={STATUS}` | Change status, e.g. to `UNDER_REVIEW` |
+| PATCH | `/api/incidents/{id}/notes` | Add a dated admin note |
 | PATCH | `/api/incidents/{id}/resolve` | Resolve with notes |
 | GET | `/api/incidents/report?from={instant}&to={instant}` | Summary for a date range |
 
-**Flag an incident** (the reporter must have role `RECIPIENT_ORG`, otherwise `400`)
+**Severity levels**
+
+| Value | Meaning |
+|---|---|
+| `LOW` | Minor issue, no risk to health |
+| `MEDIUM` | Possible food-safety concern; the food needs to be checked or discarded |
+| `HIGH` | Clear risk to health, or a near miss |
+
+**Flag an incident.** The reporter must have role `RECIPIENT_ORG` and must hold a non-cancelled reservation for that donation. Otherwise `400`: "Only the recipient organisation that reserved or collected this donation can flag an incident".
 ```json
 {
-  "description": "Verbal use-by date did not match the date printed on the stock",
-  "severity": "SEVERE"
+  "description": "Use-by date on the stock did not match what we were told",
+  "severity": "MEDIUM",
+  "reporterRole": "Kitchen manager",
+  "additionalNotes": "Food was discarded before service"
 }
 ```
-Returns `201`:
+`description` and `severity` are required. `reporterRole` (max 100) and `additionalNotes` (max 1000) are optional. Returns `201`:
 ```json
 {
   "id": 1,
   "donationId": 1,
   "donationTitle": "Fresh Bread",
+  "donationDescription": null,
   "donorId": 1,
   "donorName": "Test Donor",
   "donorOrganisation": "Test Cafe",
   "reportedById": 2,
   "reportedByName": "Kitchen Contact",
-  "description": "Verbal use-by date did not match the date printed on the stock",
-  "severity": "SEVERE",
+  "reportedByOrganisation": "Test Community Kitchen",
+  "reporterRole": "Kitchen manager",
+  "description": "Use-by date on the stock did not match what we were told",
+  "additionalNotes": "Food was discarded before service",
+  "severity": "MEDIUM",
   "status": "OPEN",
-  "reportedAt": "2026-10-06T01:15:51.374220100Z",
+  "reportedAt": "2026-10-09T01:15:51.374220100Z",
   "resolvedAt": null,
-  "resolutionNotes": null
+  "resolutionNotes": null,
+  "donorFollowUp": null,
+  "adminNotes": null
 }
 ```
-Every incident response includes the donor who supplied the item (`donorId`, `donorName`, `donorOrganisation`) alongside the donation and the reporting organisation.
 
-**Resolve an incident**
+**Add an admin note** (`PATCH /api/incidents/{id}/notes`)
 ```json
-{ "resolutionNotes": "Donor contacted and the date check added to the collection process" }
+{ "note": "Phoned the donor and left a message" }
 ```
-Returns `200` with `status: "RESOLVED"` and `resolvedAt` set.
+Each note is appended on a new line with today's date (Adelaide), e.g. `[2026-10-09] Phoned the donor...`. Returns `200` with `adminNotes`. A blank note returns `400`. A full notes field (4000 characters) returns `400`.
+
+**Change status** (`PATCH /api/incidents/{id}/status?status=`). Use it for `OPEN` and `UNDER_REVIEW` only. `RESOLVED` returns `400` ("Use the resolve action and enter a resolution note to resolve an incident"). Changing a resolved incident returns `400` ("A resolved incident can't be changed").
+
+**Resolve an incident** (`PATCH /api/incidents/{id}/resolve`)
+```json
+{
+  "resolutionNotes": "Donor advised, item discarded, labelling process reviewed",
+  "resolvedOn": "2026-10-09T00:00:00Z",
+  "donorFollowUp": "Donor will re-check labels each morning"
+}
+```
+`resolutionNotes` is required (blank returns `400`). `resolvedOn` is optional and defaults to now; it can't be in the future or before the incident was reported. `donorFollowUp` is optional. Resolving twice returns `400` ("This incident has already been resolved"). Returns `200` with `status: "RESOLVED"`.
+
+Every incident response includes the donor who supplied the item and the reporting organisation.
 
 **Period report**, e.g. `GET /api/incidents/report?from=2026-01-01T00:00:00Z&to=2026-12-31T23:59:59Z`
 ```json
@@ -253,7 +283,7 @@ Returns `200` with `status: "RESOLVED"` and `resolvedAt` set.
   "from": "2026-01-01T00:00:00Z",
   "to": "2026-12-31T23:59:59Z",
   "totalIncidents": 1,
-  "incidentsBySeverity": { "SEVERE": 1 },
+  "incidentsBySeverity": { "MEDIUM": 1 },
   "incidentsByStatus": { "RESOLVED": 1 },
   "incidents": [ ... ]
 }
@@ -283,6 +313,7 @@ Notifications are created **automatically** by these events. Each fires once, so
 | A recipient organisation flags an incident | Every administrator | `INCIDENT_FLAGGED` |
 | An admin resolves an incident | The organisation that flagged it | `INCIDENT_RESOLVED` |
 | An admin approves a recipient organisation | That organisation | `RECIPIENT_ORG_VERIFIED` |
+| A reserved donation passes its collection deadline without being collected | The recipient (with a warning), the donor, and every administrator | `MISSED_COLLECTION` |
 
 Each notification has a short message (for example `Test Community Kitchen reserved "Fresh Bread" for pickup.`) and, where it applies, a `relatedDonationId`. `NEW_DONATION_AVAILABLE` and `DONATION_EXPIRING_SOON` exist as types, but nothing creates them yet. Any notification can still be created by hand with `POST /api/notifications`. The dashboard's `unreadNotifications` counts these too.
 
@@ -308,7 +339,7 @@ Each notification has a short message (for example `Test Community Kitchen reser
   "totalIncidents": 1,
   "unresolvedIncidents": 0,
   "incidentsByStatus": { "RESOLVED": 1 },
-  "incidentsBySeverity": { "SEVERE": 1 }
+  "incidentsBySeverity": { "MEDIUM": 1 }
 }
 ```
 `unresolvedIncidents` counts incidents that are `OPEN` or `UNDER_REVIEW`. This is the number an admin needs to follow up.
@@ -321,10 +352,45 @@ Each notification has a short message (for example `Test Community Kitchen reser
 
 ---
 
+## Missed collections (`/api/missed-collections`) ✅ (added 16 Oct 2026)
+
+A background job runs every 60 seconds. When a donation is still `RESERVED` after its `collectionDeadline` has passed, it:
+
+1. sets the reservation to `MISSED`,
+2. sets the donation to `EXPIRED`,
+3. sends a `MISSED_COLLECTION` notification to the recipient (a warning that repeated misses may lead to suspension), to the donor, and to every admin.
+
+Nothing is suspended automatically. An admin reviews the list and suspends an organisation by hand.
+
+| Method | Endpoint | Notes |
+|---|---|---|
+| GET | `/api/missed-collections` | ✅ `200`. One row per recipient organisation with at least one missed collection, worst first (highest `missedCount`, then most recent). Empty list `[]` when there are none |
+
+Example row:
+```json
+{
+  "recipientId": 2,
+  "recipientName": "Kitchen Contact",
+  "organisationName": "Test Community Kitchen",
+  "email": "kitchen@test.com",
+  "phoneNumber": null,
+  "verificationStatus": "APPROVED",
+  "missedCount": 1,
+  "lastMissedAt": "2026-10-16T04:52:00Z",
+  "missedItems": [
+    { "donationId": 1, "donationTitle": "Missed Collection Test Bread", "collectionDeadline": "2026-10-16T04:52:00Z" }
+  ]
+}
+```
+
+To suspend or reinstate an organisation, use the existing `PUT /api/users/{id}` with `{"verificationStatus": "REJECTED"}` (suspend) or `{"verificationStatus": "APPROVED"}` (reinstate). A `REJECTED` organisation can't reserve.
+
+---
+
 ## Known limitations
 
 1. **No real authentication.** Login checks the password but returns no token, and every other endpoint is open (`permitAll`). Anyone can call any endpoint as any user id, and anyone can register as `ADMIN` through `POST /api/users`.
-2. **Incident flagging is loosely controlled.** Any user with role `RECIPIENT_ORG` can flag any donation, even one they never reserved, and even if the org is still `PENDING`.
+2. **Incident flagging is limited to the reserving organisation** (changed 9 Oct 2026). The check uses the `reportedByUserId` the caller sends, and with no real authentication that id can be anyone's.
 3. **Data resets on restart.** The dev database is H2 in memory, so everything is wiped each time the app restarts and ids start again from 1.
 
 ---
@@ -340,3 +406,4 @@ If Maven fails with `Index 6 out of bounds`, run `mvn clean` and start again.
 
 ---
 
+*Incident section updated 9 Oct 2026 and verified with 16 manual tests (N1 to N16) plus a browser walk-through of the frontend. Earlier sections last checked: 7 Oct 2026, from the controller and service source, a 43-request manual test run, five login tests, the incident donor fields and the automatic notifications.*

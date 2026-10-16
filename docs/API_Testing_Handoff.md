@@ -36,6 +36,9 @@ A 43-request file was run in order against a fresh database. Ids in later reques
 
 Errors from every controller now return a JSON body with an `error` field that explains the problem. Assert on it in your tests, with one caveat: for the user, notification and dashboard endpoints only the status codes were recorded, so check the wording yourself.
 
+### Update 9 Oct 2026: incident rules
+Tests N1 to N16 in `test.http` cover the host organisation's incident requirements (severity rename, reservation check, reporter role and notes, admin notes, resolve rules). All 16 passed. Old severity values in the earlier results below (`SEVERE` etc.) are now `LOW`, `MEDIUM`, `HIGH`.
+
 ### Login and incident donor fields (Anil, 6 Oct 2026)
 
 | Test | Expected | Result |
@@ -62,6 +65,19 @@ After the donor-fields change, re-run blocks 12 to 18 of the 43-request file (in
 | `GET /api/dashboard/stats` after the full flow | `unreadNotifications` is 5, no longer 0 | Pass (body checked) |
 
 Anything that expects `unreadNotifications` to be 0 after a full run needs updating.
+
+### Missed collections (Anil, 16 Oct 2026)
+
+| Test | Expected | Result |
+|---|---|---|
+| Donation with a deadline ~10 minutes away, reserved by an approved org | 201, reservation `PENDING`, donation `RESERVED` | Pass |
+| `GET /api/missed-collections` before the deadline | `[]` | Pass |
+| Same call after the deadline plus up to 60 seconds | One row: org name, `missedCount` 1, the donation in `missedItems` | Pass |
+| Donation status after the job | `EXPIRED` | Pass |
+| Notifications after the job | Recipient, donor and admin each get `MISSED_COLLECTION` | Pass |
+| Suspend then reinstate the org (`PUT /api/users/{id}`) | `REJECTED` then `APPROVED` | Pass |
+
+To repeat the test, use a deadline a few minutes ahead (UTC) and wait for it to pass. Nothing is suspended automatically.
 
 ### Still to run
 
@@ -93,9 +109,12 @@ Anything that expects `unreadNotifications` to be 0 after a full run needs updat
 - [ ] `GET /incidents/{id}` for an existing incident
 - [ ] Two incidents on one donation: both listed, report counts both
 - [ ] Report for a range with no incidents (expect `totalIncidents` 0)
-- [ ] Moving a `RESOLVED` incident back to `OPEN`. The API allows it; note it for the team to decide
-- [ ] A `PENDING` recipient flags an incident (currently allowed)
-- [ ] A recipient flags a donation it never reserved (currently allowed; raise with Chenlu)
+- [ ] A recipient flags a donation it never reserved (expect 400)
+- [ ] A recipient whose reservation was cancelled flags the donation (expect 400)
+- [ ] Old severity values `MINOR`, `MODERATE`, `SEVERE` (expect 400)
+- [ ] Resolve with a blank note, a future date, and twice (expect 400 each)
+- [ ] Set status to `RESOLVED` through the status endpoint, and reopen a resolved incident (expect 400 each)
+- [ ] Add two admin notes and check both appear with dates
 
 **Donations and reservations**
 - [ ] Donation with zero or negative quantity (expect 400)
@@ -107,7 +126,7 @@ Anything that expects `unreadNotifications` to be 0 after a full run needs updat
 ### Known issues
 
 1. **No real authentication.** Login checks the password but there is no token, so anyone can call any endpoint as any user.
-2. **Incident flagging is loose.** There is no check that the flagging org collected that donation or is approved.
+2. **Incident flagging requires a reservation** (changed 9 Oct 2026). The flagging org must hold a non-cancelled reservation for the donation. The check trusts the `reportedByUserId` sent, because there is no real authentication.
 3. **Anyone can register as `ADMIN`.** `POST /api/users` accepts any role, so the registration screen must only offer Donor and Recipient organisation.
 4. **Some events still create no notification:** cancelling a reservation, a donation expiring, and a new donation being posted.
 5. **Test data disappears on restart.**
@@ -140,7 +159,8 @@ Keep a defect log with screenshots and the request and response for every failin
 | Open incident count | `unresolvedIncidents` in the stats response |
 | Incident list | `GET /api/incidents`, or `/api/incidents/status/OPEN` for open ones |
 | Mark under review | `PATCH /api/incidents/{id}/status?status=UNDER_REVIEW` |
-| Resolve with notes | `PATCH /api/incidents/{id}/resolve` with `{"resolutionNotes": "..."}` |
+| Add admin note | `PATCH /api/incidents/{id}/notes` with `{"note": "..."}` (dated automatically) |
+| Resolve | `PATCH /api/incidents/{id}/resolve` with `{"resolutionNotes": "...", "resolvedOn": "<optional, not in future>", "donorFollowUp": "<optional>"}` |
 | Approve a recipient org | `PUT /api/users/{id}` with `{"verificationStatus": "APPROVED"}` |
 | Pending orgs | `GET /api/users/pending-verifications` (not yet tested) |
 | Incident report for a period | `GET /api/incidents/report?from=...&to=...` |
@@ -153,20 +173,22 @@ Keep a defect log with screenshots and the request and response for every failin
 | Reserve | `POST /api/reservations?recipientOrgId={id}` |
 | My reservations | `GET /api/reservations/recipient/{recipientOrgId}` |
 | Cancel a reservation | `DELETE /api/reservations/{id}` |
-| Flag a problem with a donation | `POST /api/donations/{donationId}/incidents?reportedByUserId={id}` with `{"description": "...", "severity": "MINOR" \| "MODERATE" \| "SEVERE"}` |
+| Flag a problem with a donation | `POST /api/donations/{donationId}/incidents?reportedByUserId={id}` with `{"description": "...", "severity": "LOW" \| "MEDIUM" \| "HIGH", "reporterRole": "...", "additionalNotes": "..."}` (last two optional); the reporter must hold a non-cancelled reservation for the donation |
 
 ### Dropdown values
 - Category: `FRESH_PRODUCE`, `BAKERY`, `DAIRY`, `MEAT_AND_SEAFOOD`, `PANTRY_AND_DRY_GOODS`, `PREPARED_MEALS`, `BEVERAGES`, `OTHER`
-- Incident severity: `MINOR`, `MODERATE`, `SEVERE`
+- Incident severity: `LOW` (minor, no risk), `MEDIUM` (possible food-safety concern), `HIGH` (clear risk or near miss)
 - Incident status: `OPEN`, `UNDER_REVIEW`, `RESOLVED`
 
 ### Things to know
+- Missed collections: an admin page can call `GET /api/missed-collections` and use `PUT /api/users/{id}` with `REJECTED` / `APPROVED` for Suspend / Reinstate. A reservation can now have status `MISSED`; don't show "Report a problem" on it. Recipients should see a warning when they have missed collections.
 - A new recipient org starts as `PENDING` and **can't reserve** until approved. For testing, approve it with the `PUT` call above.
 - A reserved donation disappears from `/api/donations/available`. Refresh the list after a reservation.
 - Cancelling a reservation puts the donation back in the available list, and it can then be reserved again.
 - Each incident includes `donorId`, `donorName` and `donorOrganisation`, so the admin incident list needs no extra lookup.
 - Notifications now appear on their own. For a bell icon, call `GET /api/notifications/user/{id}/unread` and show the count. Mark one as read with `PATCH /api/notifications/{id}/read`, or all of them with `PATCH /api/notifications/user/{id}/read-all`.
-- Only users with role `RECIPIENT_ORG` can flag an incident. Show the "Flag a problem" button only to recipient orgs.
+- Only a `RECIPIENT_ORG` with a non-cancelled reservation on the donation can flag an incident. Show the "Report a problem" button only on such reservations.
 
 ---
 
+*Compiled by Anil, 6 Oct 2026, from the source code and manual testing.*
