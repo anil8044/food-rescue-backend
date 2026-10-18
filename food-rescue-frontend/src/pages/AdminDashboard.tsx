@@ -107,6 +107,24 @@ export default function AdminDashboard() {
   Review recipient applications
 </Button>
 
+<Button
+  component={RouterLink}
+  to="/admin/incidents"
+  variant="contained"
+  sx={{ ml: 2, mb: 3 }}
+>
+  Manage incidents
+</Button>
+
+<Button
+  component={RouterLink}
+  to="/admin/incidents/report"
+  variant="outlined"
+  sx={{ ml: 2, mb: 3 }}
+>
+  Incident report
+</Button>
+
       {loading && (
         <Box>
           <CircularProgress
