@@ -14,6 +14,17 @@ export default function AppLayout() {
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
             <Button color="inherit" component={Link} to="/">Home</Button>
 <Button color="inherit" component={Link} to="/donations">Browse donations</Button>
+{user?.role === 'DONOR' && (
+  <Button color="inherit" component={Link} to="/donor">
+    Donor portal
+  </Button>
+)}
+
+{user?.role === 'ADMIN' && (
+  <Button color="inherit" component={Link} to="/admin">
+    Admin dashboard
+  </Button>
+)}
 {user ? <>
               <Typography variant="body2">{user.fullName} · {user.role}</Typography>
               <Button color="inherit" onClick={logout}>Log out</Button>

@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import { api } from '../api/client'
+import { Link as RouterLink } from 'react-router-dom'
 
 type Recipient = {
   id: number
@@ -133,6 +134,13 @@ export default function RecipientApprovals() {
 
   return (
     <Box sx={{ py: 4 }}>
+      <Button
+      component={RouterLink}
+      to="/admin"
+      sx={{ mb: 2 }}
+>
+       Back to dashboard
+      </Button>
       <Typography
         component="h1"
         variant="h4"

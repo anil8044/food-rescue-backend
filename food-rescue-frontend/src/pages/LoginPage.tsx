@@ -22,9 +22,22 @@ export default function LoginPage() {
     try {
       const user = await loginUser(email.trim(), password)
       login(user)
-      navigate(canVisit(from, user.role) ? from : '/', {
-        replace: true, state: canVisit(from, user.role) ? null : { denied: true },
-      })
+const home =
+  user.role === 'ADMIN'
+    ? '/admin'
+    : user.role === 'DONOR'
+      ? '/donor'
+      : '/donations'
+
+const destination =
+  from !== '/' && canVisit(from, user.role)
+    ? from
+    : home
+
+navigate(destination, {
+  replace: true,
+  state: null,
+})
     } catch (err) { setError(err instanceof Error ? err.message : 'Login failed.') }
     finally { setBusy(false) }
   }

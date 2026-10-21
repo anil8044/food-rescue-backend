@@ -6,6 +6,7 @@ import {
 } from '@mui/material'
 import { getIncidentReport } from '../api/incidents'
 import type { IncidentReport } from '../api/incidents'
+import { Link as RouterLink } from 'react-router-dom'
 
 function localToday() {
   const now = new Date()
@@ -88,6 +89,13 @@ export default function IncidentReportPage() {
 
   return (
     <Box sx={{ py: 4 }}>
+      <Button
+      component={RouterLink}
+      to="/admin"
+      sx={{ mb: 2 }}
+>
+      Back to dashboard
+    </Button>
       <GlobalStyles
         styles={{
           '@media print': {

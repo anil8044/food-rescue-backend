@@ -9,6 +9,7 @@ import {
 } from '../api/incidents'
 import type { Incident, IncidentStatus } from '../api/incidents'
 import ResolveIncidentDialog from '../components/ResolveIncidentDialog'
+import { Link as RouterLink } from 'react-router-dom'
 
 const statusLabels: Record<IncidentStatus, string> = {
   OPEN: 'Open',
@@ -112,6 +113,13 @@ export default function AdminIncidents() {
 
   return (
     <Box sx={{ py: 4 }}>
+      <Button
+      component={RouterLink}
+      to="/admin"
+      sx={{ mb: 2 }}
+>
+      Back to dashboard
+    </Button>
       <Typography
         component="h1"
         variant="h4"
