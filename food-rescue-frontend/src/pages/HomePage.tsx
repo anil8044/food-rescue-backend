@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Alert, Box, Button, Chip, CircularProgress, Paper, Stack, Typography } from '@mui/material'
 import { api } from '../api/client'
+import { COLORS } from '../theme'
+import BrandMark from '../components/BrandMark'
 
 type Connection =
   | { state: 'loading' }
@@ -29,10 +31,11 @@ export default function HomePage() {
   }, [attempt])
 
   return (
-    <Stack spacing={4}>
-      <Box>
-        <Chip label="South Australian Food Rescue Network" color="primary" variant="outlined" sx={{ mb: 2 }} />
-        <Typography variant="h3" component="h1" sx={{ fontWeight: 700, maxWidth: 720 }}>
+    <Stack spacing={5}>
+      <Box sx={{ p: { xs: 3, md: 6 }, borderRadius: 5, background: 'linear-gradient(120deg, #e6f3ea 0%, #fbf8f3 70%, #fdebdc 100%)', border: '1px solid rgba(43,138,87,.12)' }}>
+        <Box sx={{ mb: 3 }}><BrandMark size={56} /></Box>
+<Chip label="South Australian Food Rescue Network" color="primary" variant="outlined" sx={{ mb: 2, bgcolor: 'rgba(255,255,255,.65)' }} />
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 400, maxWidth: 720, fontSize: { xs: '2.5rem', md: '3.8rem' }, lineHeight: 1.12 }}>
           Good food. Shared with our community.
         </Typography>
         <Typography color="text.secondary" sx={{ mt: 2, maxWidth: 640 }}>
@@ -40,7 +43,7 @@ export default function HomePage() {
         </Typography>
       </Box>
 
-      <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: 3 }}>
+      <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, borderRadius: 4 }}>
         <Typography variant="h6" component="h2" gutterBottom>Service status</Typography>
         <Box aria-live="polite">
           {connection.state === 'loading' && (
@@ -72,9 +75,10 @@ export default function HomePage() {
           ['Donate food', 'Share surplus food with local community organisations.'],
           ['Receive food', 'Find donations and arrange collection for your organisation.'],
           ['Support safe sharing', 'Keep food information and reported concerns together.'],
-        ].map(([title, description]) => (
-          <Paper key={title} variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" component="h2" gutterBottom>{title}</Typography>
+        ].map(([title, description], index) => (
+          <Paper key={title} variant="outlined" sx={{ p: 3, borderRadius: 4 }}>
+            <Box aria-hidden="true" sx={{ width: 48, height: 48, borderRadius: 3, bgcolor: [COLORS.mint, COLORS.peach, COLORS.sky][index], color: 'primary.main', display: 'grid', placeItems: 'center', mb: 2, fontSize: '1.2rem', fontWeight: 600 }}>0{index + 1}</Box>
+<Typography variant="h6" component="h2" gutterBottom>{title}</Typography>
             <Typography color="text.secondary">{description}</Typography>
           </Paper>
         ))}
@@ -82,5 +86,3 @@ export default function HomePage() {
     </Stack>
   )
 }
-
-

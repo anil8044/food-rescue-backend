@@ -10,3 +10,13 @@ export function createReservation(recipientOrgId: number, donationId: number, sc
   })
 }
 
+
+export function getMyReservations(userId: number, signal?: AbortSignal) {
+  return api<Reservation[]>(`/reservations/recipient/${userId}`, { signal })
+}
+export function collectReservation(id: number) {
+  return api<Reservation>(`/reservations/${id}/status?status=COLLECTED`, { method: 'PATCH' })
+}
+export function cancelReservation(id: number) {
+  return api<void>(`/reservations/${id}`, { method: 'DELETE' })
+}

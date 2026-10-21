@@ -1,3 +1,7 @@
 html { min-width: 320px; }
 body { margin: 0; }
-
+::selection { background: #cce8d5; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}

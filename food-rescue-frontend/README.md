@@ -61,3 +61,16 @@ Public route: /donations; Category is kept in the query string. All eight catego
 Only approved recipient organisations can reserve. Pending and rejected accounts can browse, but reserve is disabled. Donor/admin accounts can browse publicly but cannot reserve. Approval changes take effect on logout and login; refreshing donations does not refresh the user's verification state.
 
 Reservations cover the entire donation. Scheduled pickup is optional, entered in the device's local timezone and sent as an ISO instant. No future/deadline restriction is added. Success closes the dialog, shows the reservation ID/status and refreshes available donations. Backend error text remains in the dialog. RoleBoundary now wraps /recipient/*, /donor/* and /admin/*; the corresponding team business pages are still pending integration.
+
+## Remaining recipient tasks implemented on 21 October
+
+- /recipient/reservations lists the logged-in organisation's reservations.
+- Mark collected calls PATCH /reservations/{id}/status?status=COLLECTED.
+- Cancel reservation calls DELETE /reservations/{id}; HTTP 204 is supported.
+- Report a problem submits description and severity to the donation incident endpoint.
+- No extra reservation-status or collected-only restrictions are introduced; the interface follows the current backend.
+- The description is required and must not be blank, matching @NotBlank. No new UI length policy is imposed.
+- Loading, empty data, request errors, busy state and success notices are included.
+- Page screenshots and a reviewer-editable implementation draft are in ../docs.
+
+Local checks verified collection, cancellation, re-reservation, incident submission from a cancelled reservation and blank-description validation. Full team regression and host UAT are not claimed.

@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
-import { Alert, Button, Link as MuiLink, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Link as MuiLink, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { loginUser, registerUser, type RegisterRequest } from '../api/auth'
+import BrandMark from '../components/BrandMark'
 import { useAuth } from '../auth/useAuth'
 
 export default function RegisterPage() {
@@ -34,9 +35,10 @@ export default function RegisterPage() {
     } finally { setBusy(false) }
   }
   return (
-    <Paper variant="outlined" sx={{ maxWidth: 560, mx: 'auto', p: { xs: 3, md: 4 }, borderRadius: 3 }}>
+    <Paper variant="outlined" sx={{ maxWidth: 560, mx: 'auto', p: { xs: 3, md: 4 }, borderRadius: 4, boxShadow: '0 8px 30px rgba(31,42,36,.06)' }}>
       <Stack component="form" onSubmit={submit} spacing={3}>
-        <Typography variant="h4" component="h1">Create an account</Typography>
+<Box sx={{ display: 'flex', justifyContent: 'center' }}><BrandMark size={52} /></Box>
+        <Typography variant="h4" component="h1" sx={{ textAlign: 'center' }}>Create an account</Typography>
         {error && <Alert severity="error">{error}</Alert>}
         <TextField label="Full name" required autoComplete="name" value={form.fullName} disabled={busy} onChange={(e) => field('fullName', e.target.value)} />
         <TextField label="Email" required type="email" autoComplete="username" value={form.email} disabled={busy} onChange={(e) => field('email', e.target.value)} />
@@ -54,5 +56,3 @@ export default function RegisterPage() {
     </Paper>
   )
 }
-
-

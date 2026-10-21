@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
-import { Alert, Button, Link as MuiLink, Paper, Stack, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Link as MuiLink, Paper, Stack, TextField, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { loginUser } from '../api/auth'
+import BrandMark from '../components/BrandMark'
 import { useAuth } from '../auth/useAuth'
 import { canVisit, safeReturnTo } from '../auth/session'
 
@@ -29,9 +30,10 @@ export default function LoginPage() {
     finally { setBusy(false) }
   }
   return (
-    <Paper variant="outlined" sx={{ maxWidth: 480, mx: 'auto', p: { xs: 3, md: 4 }, borderRadius: 3 }}>
+    <Paper variant="outlined" sx={{ maxWidth: 480, mx: 'auto', p: { xs: 3, md: 4 }, borderRadius: 4, boxShadow: '0 8px 30px rgba(31,42,36,.06)' }}>
       <Stack component="form" onSubmit={submit} spacing={3}>
-        <Typography variant="h4" component="h1">Log in</Typography>
+<Box sx={{ display: 'flex', justifyContent: 'center' }}><BrandMark size={52} /></Box>
+        <Typography variant="h4" component="h1" sx={{ textAlign: 'center' }}>Log in</Typography>
         {state?.notice && <Alert severity="info">{state.notice}</Alert>}
         {error && <Alert severity="error">{error}</Alert>}
         <TextField label="Email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} disabled={busy} />
@@ -42,5 +44,3 @@ export default function LoginPage() {
     </Paper>
   )
 }
-
-
