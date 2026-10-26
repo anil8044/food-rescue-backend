@@ -69,3 +69,17 @@ How it fits together:
 - Notifications are checked every 30 seconds, not pushed.
 - Times are shown in the browser's time zone.
 - The design's donor-type filter (Farm, Supermarket, Cafe) is left out, because the backend has no donor-type field.
+
+## Missed collections frontend
+
+Requires a backend version with GET /api/missed-collections and the MISSED reservation status (backend branch).
+
+- Admin navigation includes /admin/missed with contact details, missed counts, food deadlines and verification status.
+- Suspend asks for confirmation and sends REJECTED through usersApi.update. Reinstate sends APPROVED. Successful actions show a snackbar and reload server data.
+- The admin overview totals missedCount across organisations, highlights a non-zero total and links its warning to the review page.
+- Recipient reservations display MISSED in red, hide the report button for MISSED and CANCELLED, and show a missed-count warning.
+- NotificationBell uses the existing endpoints unchanged. The backend creates MISSED_COLLECTION notifications and does not automatically suspend organisations.
+
+Run npm test for API contract tests (Node 22; VM modules are experimental), npm run build for a production build, and npm run dev -- --port 3000 when port 5173 is occupied.
+
+Manual end-to-end validation uses a real collection deadline and the normal 60-second backend scheduler. Reload reservation/dashboard pages after the scheduler runs. H2 development records reset when the backend restarts. Detailed local test credentials and results are maintained in the user's record.docx, outside this source directory.

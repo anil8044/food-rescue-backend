@@ -1,6 +1,6 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Alert, Button, Card, CardContent, Grid, Stack, Typography } from '@mui/material';
-import { dashboardApi } from '../../api';
+import { dashboardApi, missedApi } from '../../api';
 import useFetch from '../../hooks/useFetch';
 import PageHeader from '../../components/PageHeader';
 import QueryState from '../../components/QueryState';
@@ -18,11 +18,22 @@ function toRows(map, colors, labeller = humanize) {
 
 export default function AdminDashboard() {
   const stats = useFetch(() => dashboardApi.stats(), []);
+  const missed = useFetch(() => missedApi.summary(), []);
+  const missedTotal = (missed.data || []).reduce((total, org) => total + org.missedCount, 0);
   const s = stats.data;
 
   return (
     <>
       <PageHeader eyebrow="Admin console" title="Platform overview" subtitle="Donation activity and food-safety follow-ups at a glance." />
+
+      <QueryState loading={missed.loading} error={missed.error}>
+        <Grid container spacing={2} sx={{ mb: 3 }}><Grid item xs={6} md={3}>
+          <StatCard label="Missed collections" value={missedTotal} color="#c93c3c" highlight={missedTotal > 0} />
+        </Grid></Grid>
+        {missedTotal > 0 && <Alert severity="warning" sx={{ mb: 3 }} action={
+          <Button component={RouterLink} to="/admin/missed" color="inherit" size="small">Review</Button>
+        }>{missedTotal} reservation{missedTotal === 1 ? '' : 's'} {missedTotal === 1 ? 'was' : 'were'} never collected.</Alert>}
+      </QueryState>
 
       <QueryState loading={stats.loading} error={stats.error}>
         {s && (
@@ -132,3 +143,4 @@ export default function AdminDashboard() {
     </>
   );
 }
+

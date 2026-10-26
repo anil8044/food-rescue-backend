@@ -22,6 +22,8 @@ export default function MyReservationsPage() {
   // Newest first
   const sorted = [...(reservations.data || [])].sort((a, b) => new Date(b.reservedAt) - new Date(a.reservedAt));
 
+  const missedCount = sorted.filter((r) => r.status === 'MISSED').length;
+
   async function run(action, successMessage) {
     setActionError('');
     try {
@@ -45,6 +47,12 @@ export default function MyReservationsPage() {
   return (
     <>
       <PageHeader eyebrow="Recipient portal" title="My reservations" subtitle="Track pickups and report any problems." />
+
+      {!reservations.loading && !reservations.error && missedCount > 0 && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          You have {missedCount} missed collection{missedCount === 1 ? '' : 's'}. Food that is reserved but not collected goes to waste. Repeated misses may lead to your organisation being suspended.
+        </Alert>
+      )}
 
       {actionError && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -92,7 +100,7 @@ export default function MyReservationsPage() {
                               Cancel
                             </Button>
                           )}
-                          {r.status !== 'CANCELLED' && (
+                          {r.status !== 'CANCELLED' && r.status !== 'MISSED' && (
                             <Button size="small" color="error" onClick={() => setFlagging(r)}>
                               Report a problem
                             </Button>
@@ -123,3 +131,4 @@ export default function MyReservationsPage() {
     </>
   );
 }
+

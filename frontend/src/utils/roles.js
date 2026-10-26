@@ -16,6 +16,8 @@ export const NAV_ITEMS = {
     { to: '/admin', label: 'Overview' },
     { to: '/admin/incidents', label: 'Incidents' },
     { to: '/admin/recipients', label: 'Recipient approvals' },
+    { to: '/admin/missed', label: 'Missed collections' },
     { to: '/admin/report', label: 'Incident report' },
   ],
 };
+

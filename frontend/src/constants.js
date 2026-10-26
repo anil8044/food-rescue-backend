@@ -26,7 +26,7 @@ const RED = '#c93c3c';
 // Chip colours for every status value (same palette as the design's status badges)
 export const STATUS_COLORS = {
   donation: { AVAILABLE: GREEN, RESERVED: ORANGE, COLLECTED: BLUE, EXPIRED: GREY, CANCELLED: GREY },
-  reservation: { PENDING: ORANGE, CONFIRMED: BLUE, COLLECTED: GREEN, CANCELLED: GREY },
+  reservation: { PENDING: ORANGE, CONFIRMED: BLUE, COLLECTED: GREEN, CANCELLED: GREY, MISSED: RED },
   incident: { OPEN: RED, UNDER_REVIEW: ORANGE, RESOLVED: GREEN },
   severity: { LOW: BLUE, MEDIUM: ORANGE, HIGH: RED },
   verification: { PENDING: ORANGE, APPROVED: GREEN, REJECTED: RED },
@@ -42,3 +42,4 @@ export function humanize(value) {
   const text = String(value).replace(/_/g, ' ').toLowerCase();
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+

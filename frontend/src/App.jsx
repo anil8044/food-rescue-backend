@@ -14,6 +14,7 @@ import BrowseDonationsPage from './pages/recipient/BrowseDonationsPage';
 import MyReservationsPage from './pages/recipient/MyReservationsPage';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
+import MissedCollectionsPage from './pages/admin/MissedCollectionsPage';
 import IncidentsPage from './pages/admin/IncidentsPage';
 import RecipientApprovalsPage from './pages/admin/RecipientApprovalsPage';
 import IncidentReportPage from './pages/admin/IncidentReportPage';
@@ -47,6 +48,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/incidents" element={<IncidentsPage />} />
+          <Route path="/admin/missed" element={<MissedCollectionsPage />} />
           <Route path="/admin/recipients" element={<RecipientApprovalsPage />} />
           <Route path="/admin/report" element={<IncidentReportPage />} />
         </Route>
@@ -56,3 +58,4 @@ export default function App() {
     </Routes>
   );
 }
+

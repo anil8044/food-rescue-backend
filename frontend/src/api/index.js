@@ -47,3 +47,5 @@ export const dashboardApi = {
   stats: () => get('/dashboard/stats'),
   userStats: (userId) => get(`/dashboard/user/${userId}/stats`),
 };
+
+export const missedApi = { summary: () => get('/missed-collections') };
