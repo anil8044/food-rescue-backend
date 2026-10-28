@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,11 +39,13 @@ public class DonationController {
         return ResponseEntity.ok(donationService.getAvailableDonations());
     }
 
+    @PreAuthorize("@authz.selfOrAdmin(#donorId)")
     @GetMapping("/donor/{donorId}")
     public ResponseEntity<List<DonationDTO>> getDonorDonations(@PathVariable Long donorId) {
         return ResponseEntity.ok(donationService.getDonorDonations(donorId));
     }
 
+    @PreAuthorize("hasRole('DONOR') and @authz.isSelf(#donorId)")
     @PostMapping
     public ResponseEntity<DonationDTO> createDonation(
             @RequestParam Long donorId,
@@ -56,6 +59,7 @@ public class DonationController {
         return ResponseEntity.ok(donationService.getDonationsByStatus(status));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @authz.ownsDonation(#id)")
     @PatchMapping("/{id}/status")
     public ResponseEntity<DonationDTO> updateDonationStatus(
             @PathVariable Long id,
@@ -63,6 +67,7 @@ public class DonationController {
         return ResponseEntity.ok(donationService.updateDonationStatus(id, status));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @authz.ownsDonation(#id)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDonation(@PathVariable Long id) {
         donationService.deleteDonation(id);

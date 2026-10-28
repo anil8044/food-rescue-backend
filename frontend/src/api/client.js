@@ -1,5 +1,30 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
+const TOKEN_KEY = 'foodRescueToken';
+
+export function getToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setToken(token) {
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    /* storage unavailable: the user will simply need to sign in again */
+  }
+}
+
+// Called when the server says the session is no longer valid (401 outside the login call).
+let unauthorizedHandler = null;
+export function onUnauthorized(handler) {
+  unauthorizedHandler = handler;
+}
+
 export class ApiError extends Error {
   constructor(message, status) {
     super(message);
@@ -9,7 +34,8 @@ export class ApiError extends Error {
 }
 
 function fallbackMessage(status) {
-  if (status === 401) return 'Invalid email or password';
+  if (status === 401) return 'Please sign in to continue.';
+  if (status === 403) return 'You do not have permission to do this.';
   if (status === 404) return 'The requested item was not found.';
   if (status >= 500) return 'The server had a problem. Please try again.';
   return 'The request could not be completed.';
@@ -27,6 +53,8 @@ async function request(method, path, { body, params } = {}) {
   }
 
   const options = { method, headers: {} };
+  const token = getToken();
+  if (token) options.headers.Authorization = `Bearer ${token}`;
   if (body !== undefined) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body);
@@ -52,6 +80,10 @@ async function request(method, path, { body, params } = {}) {
   }
 
   if (!response.ok) {
+    if (response.status === 401 && path !== '/auth/login') {
+      setToken(null);
+      if (unauthorizedHandler) unauthorizedHandler();
+    }
     // The backend puts the user-facing explanation in "error".
     const message = (data && (data.error || data.message)) || fallbackMessage(response.status);
     throw new ApiError(message, response.status);

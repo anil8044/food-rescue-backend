@@ -4,6 +4,7 @@ import com.foodrescue.backend.dto.MissedCollectionSummaryDTO;
 import com.foodrescue.backend.service.MissedCollectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,7 @@ public class MissedCollectionController {
     /**
      * GET /api/missed-collections - recipient organisations with missed collections, worst first
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<MissedCollectionSummaryDTO>> getSummary() {
         return ResponseEntity.ok(missedCollectionService.getSummary());

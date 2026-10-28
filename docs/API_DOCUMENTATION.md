@@ -407,3 +407,35 @@ If Maven fails with `Index 6 out of bounds`, run `mvn clean` and start again.
 ---
 
 *Incident section updated 9 Oct 2026 and verified with 16 manual tests (N1 to N16) plus a browser walk-through of the frontend. Earlier sections last checked: 7 Oct 2026, from the controller and service source, a 43-request manual test run, five login tests, the incident donor fields and the automatic notifications.*
+
+## Authentication and authorisation
+
+Every endpoint except `POST /api/auth/login` and `POST /api/users` (registration) needs a signed-in user.
+
+**Sign in.** `POST /api/auth/login` with `{ "email", "password" }` returns `{ "token", "tokenType": "Bearer", "expiresInSeconds", "user": { ... } }`. Send the token on every later request: `Authorization: Bearer <token>`. Tokens last 8 hours. A suspended (REJECTED) recipient organisation cannot sign in, and an existing token stops working immediately.
+
+**Registration.** Anyone can register as `DONOR` or `RECIPIENT_ORG`. Registering as `ADMIN` returns 403. The first administrator is created at start-up from `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` (development defaults: `admin@example.test` / `Admin123!`, fake data only).
+
+**Status codes.** 401 = not signed in or token invalid. 403 = signed in but not allowed.
+
+| Area | Who may do it |
+| --- | --- |
+| Browse donations (all, available, by status, by id) | Any signed-in user |
+| Post a donation | Donor, only as themselves (`donorId` must be their own id) |
+| View own donations | The donor, or an administrator |
+| Change status of or delete a donation | The donor who owns it, or an administrator |
+| Reserve a donation | Approved recipient, only as themselves |
+| View, change or cancel a reservation | The recipient who owns it, or an administrator |
+| List all reservations or reservations by status | Administrator |
+| Flag a problem (create an incident) | Recipient, only as themselves, and only for a donation they reserved |
+| View, review, resolve incidents and the incident report | Administrator |
+| Missed collections summary and dashboard statistics | Administrator |
+| Own dashboard statistics and notifications | The user, or an administrator |
+| Create notifications | Administrator |
+| List users, find by email, pending verifications, delete a user | Administrator |
+| View or update own profile | The user (cannot change `verificationStatus`) or an administrator |
+| Approve, reject or suspend an organisation (`verificationStatus`) | Administrator |
+
+**Configuration (environment variables).** `JWT_SECRET` (at least 32 characters; required with the `prod` profile), `CORS_ALLOWED_ORIGINS` (comma-separated frontend addresses), `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`.
+
+**Tests.** `auth-tests.http` has 39 requests with the expected status for each.

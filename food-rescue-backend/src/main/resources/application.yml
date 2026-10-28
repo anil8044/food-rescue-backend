@@ -8,6 +8,19 @@ spring:
   profiles:
     active: dev
 
+app:
+  jwt:
+    # Set JWT_SECRET in production (at least 32 characters). The default only works in dev.
+    secret: ${JWT_SECRET:dev-only-secret-change-me-before-deploying-0123456789}
+    expiration-minutes: 480
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  bootstrap-admin:
+    # An ADMIN cannot register publicly. If no admin exists, one is created from these values.
+    # Dev defaults are set in the dev profile below; in production set both environment variables.
+    email: ${BOOTSTRAP_ADMIN_EMAIL:}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+
 ---
 spring:
   config:
@@ -29,6 +42,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+app:
+  bootstrap-admin:
+    # Fake development admin. Change or remove for any shared or deployed environment.
+    email: ${BOOTSTRAP_ADMIN_EMAIL:admin@example.test}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:Admin123!}
 
 ---
 spring:

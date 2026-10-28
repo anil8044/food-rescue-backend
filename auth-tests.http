@@ -1,0 +1,233 @@
+# Authentication and authorisation tests (fake data only).
+# 1. Restart the backend first (the dev database is wiped on restart).
+# 2. Run the blocks in order, top to bottom (VS Code REST Client: "Send Request" on each ###).
+# 3. The development administrator is created at start-up: admin@example.test / Admin123!
+# Record each actual status code in the Appendix B authorisation table of the report.
+
+@host = http://localhost:8080
+
+### A01 Admin logs in (expect 200, token and user.role ADMIN)
+# @name adminLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "admin@example.test", "password": "Admin123!" }
+
+### A02 Register a donor (expect 201, public)
+# @name donorReg
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "fullName": "Test Donor", "email": "donor@example.test", "password": "password123", "role": "DONOR", "organisationName": "Test Cafe" }
+
+### A03 Register a recipient organisation (expect 201, verificationStatus PENDING)
+# @name recipientReg
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "fullName": "Test Recipient", "email": "recipient@example.test", "password": "password123", "role": "RECIPIENT_ORG", "organisationName": "Test Kitchen" }
+
+### A04 Register with the ADMIN role without signing in (expect 403)
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "fullName": "Sneaky Admin", "email": "sneaky@example.test", "password": "password123", "role": "ADMIN" }
+
+### A05 Donor logs in (expect 200)
+# @name donorLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "donor@example.test", "password": "password123" }
+
+### A06 Recipient logs in (expect 200)
+# @name recipientLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "recipient@example.test", "password": "password123" }
+
+### A07 Wrong password (expect 401)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "donor@example.test", "password": "wrong-password" }
+
+### A08 Protected endpoint with no token (expect 401)
+GET {{host}}/api/donations/available
+
+### A09 Protected endpoint with an invalid token (expect 401)
+GET {{host}}/api/donations/available
+Authorization: Bearer not-a-real-token
+
+### A10 Donor posts a donation as themselves (expect 201)
+# @name donation1
+POST {{host}}/api/donations?donorId={{donorReg.response.body.id}}
+Authorization: Bearer {{donorLogin.response.body.token}}
+Content-Type: application/json
+
+{ "title": "Fresh Bread", "category": "BAKERY", "quantity": 5, "quantityUnit": "kg", "expiryDateTime": "2030-12-31T18:00:00Z", "collectionDeadline": "2030-12-31T17:00:00Z" }
+
+### A11 Donor posts a donation as another user (expect 403)
+POST {{host}}/api/donations?donorId={{adminLogin.response.body.user.id}}
+Authorization: Bearer {{donorLogin.response.body.token}}
+Content-Type: application/json
+
+{ "title": "Not mine", "category": "BAKERY", "quantity": 1, "quantityUnit": "kg", "expiryDateTime": "2030-12-31T18:00:00Z", "collectionDeadline": "2030-12-31T17:00:00Z" }
+
+### A12 Recipient tries to post a donation (expect 403)
+POST {{host}}/api/donations?donorId={{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+Content-Type: application/json
+
+{ "title": "Not allowed", "category": "BAKERY", "quantity": 1, "quantityUnit": "kg", "expiryDateTime": "2030-12-31T18:00:00Z", "collectionDeadline": "2030-12-31T17:00:00Z" }
+
+### A13 Recipient awaiting approval tries to reserve (expect 400, must be approved)
+POST {{host}}/api/reservations?recipientOrgId={{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+Content-Type: application/json
+
+{ "donationId": {{donation1.response.body.id}} }
+
+### A14 Recipient tries to approve their own organisation (expect 403)
+PUT {{host}}/api/users/{{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+Content-Type: application/json
+
+{ "verificationStatus": "APPROVED" }
+
+### A15 Admin approves the recipient (expect 200, APPROVED)
+PUT {{host}}/api/users/{{recipientReg.response.body.id}}
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{ "verificationStatus": "APPROVED" }
+
+### A16 Recipient reserves as another user (expect 403)
+POST {{host}}/api/reservations?recipientOrgId={{donorReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+Content-Type: application/json
+
+{ "donationId": {{donation1.response.body.id}} }
+
+### A17 Donor tries to reserve (expect 403)
+POST {{host}}/api/reservations?recipientOrgId={{donorReg.response.body.id}}
+Authorization: Bearer {{donorLogin.response.body.token}}
+Content-Type: application/json
+
+{ "donationId": {{donation1.response.body.id}} }
+
+### A18 Approved recipient reserves the donation (expect 201)
+# @name reservation1
+POST {{host}}/api/reservations?recipientOrgId={{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+Content-Type: application/json
+
+{ "donationId": {{donation1.response.body.id}} }
+
+### A19 Donor posts a second donation that nobody reserves (expect 201)
+# @name donation2
+POST {{host}}/api/donations?donorId={{donorReg.response.body.id}}
+Authorization: Bearer {{donorLogin.response.body.token}}
+Content-Type: application/json
+
+{ "title": "Fresh Milk", "category": "DAIRY", "quantity": 10, "quantityUnit": "L", "expiryDateTime": "2030-12-31T18:00:00Z", "collectionDeadline": "2030-12-31T17:00:00Z" }
+
+### A20 Recipient flags a donation it did not reserve (expect 403)
+POST {{host}}/api/donations/{{donation2.response.body.id}}/incidents?reportedByUserId={{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+Content-Type: application/json
+
+{ "description": "Not reserved by us", "severity": "LOW" }
+
+### A21 Donor tries to create an incident (expect 403)
+POST {{host}}/api/donations/{{donation1.response.body.id}}/incidents?reportedByUserId={{donorReg.response.body.id}}
+Authorization: Bearer {{donorLogin.response.body.token}}
+Content-Type: application/json
+
+{ "description": "Donor should not report", "severity": "LOW" }
+
+### A22 Recipient flags the donation it reserved (expect 201)
+POST {{host}}/api/donations/{{donation1.response.body.id}}/incidents?reportedByUserId={{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+Content-Type: application/json
+
+{ "description": "Use-by date did not match the label", "severity": "MEDIUM", "reporterRole": "Kitchen manager" }
+
+### A23 Recipient calls administrator endpoint: all users (expect 403)
+GET {{host}}/api/users
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A24 Recipient calls administrator endpoint: incidents (expect 403)
+GET {{host}}/api/incidents
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A25 Recipient calls administrator endpoint: dashboard (expect 403)
+GET {{host}}/api/dashboard/stats
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A26 Recipient calls administrator endpoint: missed collections (expect 403)
+GET {{host}}/api/missed-collections
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A27 Recipient reads another user's notifications (expect 403)
+GET {{host}}/api/notifications/user/{{donorReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A28 Recipient reads their own notifications (expect 200)
+GET {{host}}/api/notifications/user/{{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A29 Donor reads another organisation's reservations (expect 403)
+GET {{host}}/api/reservations/recipient/{{recipientReg.response.body.id}}
+Authorization: Bearer {{donorLogin.response.body.token}}
+
+### A30 Recipient reads their own reservations (expect 200)
+GET {{host}}/api/reservations/recipient/{{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A31 Admin reads all users (expect 200)
+GET {{host}}/api/users
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+### A32 Admin reads dashboard statistics (expect 200)
+GET {{host}}/api/dashboard/stats
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+### A33 Admin reads incidents (expect 200, one incident)
+GET {{host}}/api/incidents
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+### A34 Admin reads missed collections (expect 200)
+GET {{host}}/api/missed-collections
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+### A35 Admin suspends the recipient (expect 200, REJECTED)
+PUT {{host}}/api/users/{{recipientReg.response.body.id}}
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{ "verificationStatus": "REJECTED" }
+
+### A36 Suspended recipient's existing token stops working (expect 401)
+GET {{host}}/api/reservations/recipient/{{recipientReg.response.body.id}}
+Authorization: Bearer {{recipientLogin.response.body.token}}
+
+### A37 Suspended recipient cannot log in (expect 401, account not active)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "recipient@example.test", "password": "password123" }
+
+### A38 Admin reinstates the recipient (expect 200, APPROVED)
+PUT {{host}}/api/users/{{recipientReg.response.body.id}}
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{ "verificationStatus": "APPROVED" }
+
+### A39 Reinstated recipient can log in again (expect 200)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "recipient@example.test", "password": "password123" }

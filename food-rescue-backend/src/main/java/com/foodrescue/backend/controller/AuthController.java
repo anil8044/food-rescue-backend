@@ -1,7 +1,7 @@
 package com.foodrescue.backend.controller;
 
 import com.foodrescue.backend.dto.LoginRequest;
-import com.foodrescue.backend.dto.UserDTO;
+import com.foodrescue.backend.dto.AuthResponse;
 import com.foodrescue.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +22,10 @@ public class AuthController {
     private final AuthService authService;
 
     /**
-     * POST /api/auth/login - Check credentials and return the user (including role)
+     * POST /api/auth/login - Check credentials and return a signed token and the user (including role)
      */
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }

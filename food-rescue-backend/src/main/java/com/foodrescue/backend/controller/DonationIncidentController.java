@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -27,6 +28,7 @@ public class DonationIncidentController {
 
     private final DonationIncidentService incidentService;
 
+    @PreAuthorize("hasRole('RECIPIENT_ORG') and @authz.isSelf(#reportedByUserId) and @authz.hasReservedDonation(#donationId)")
     @PostMapping("/api/donations/{donationId}/incidents")
     public ResponseEntity<DonationIncidentDTO> createIncident(
             @PathVariable Long donationId,
@@ -36,26 +38,31 @@ public class DonationIncidentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/donations/{donationId}/incidents")
     public ResponseEntity<List<DonationIncidentDTO>> getIncidentsForDonation(@PathVariable Long donationId) {
         return ResponseEntity.ok(incidentService.getIncidentsByDonation(donationId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/incidents")
     public ResponseEntity<List<DonationIncidentDTO>> getAllIncidents() {
         return ResponseEntity.ok(incidentService.getAllIncidents());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/incidents/{id}")
     public ResponseEntity<DonationIncidentDTO> getIncidentById(@PathVariable Long id) {
         return ResponseEntity.ok(incidentService.getIncidentById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/incidents/status/{status}")
     public ResponseEntity<List<DonationIncidentDTO>> getIncidentsByStatus(@PathVariable IncidentStatus status) {
         return ResponseEntity.ok(incidentService.getIncidentsByStatus(status));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/api/incidents/{id}/status")
     public ResponseEntity<DonationIncidentDTO> updateIncidentStatus(
             @PathVariable Long id,
@@ -66,6 +73,7 @@ public class DonationIncidentController {
     /**
      * PATCH /api/incidents/{id}/notes - an administrator adds a note
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/api/incidents/{id}/notes")
     public ResponseEntity<DonationIncidentDTO> addNote(
             @PathVariable Long id,
@@ -76,6 +84,7 @@ public class DonationIncidentController {
     /**
      * PATCH /api/incidents/{id}/resolve - resolve with a required note
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/api/incidents/{id}/resolve")
     public ResponseEntity<DonationIncidentDTO> resolveIncident(
             @PathVariable Long id,
@@ -87,6 +96,7 @@ public class DonationIncidentController {
      * GET /api/incidents/report?from=2026-09-01T00:00:00Z&to=2026-09-30T23:59:59Z
      * Dates must be ISO-8601 instants.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/incidents/report")
     public ResponseEntity<IncidentReportDTO> getIncidentReport(
             @RequestParam String from,

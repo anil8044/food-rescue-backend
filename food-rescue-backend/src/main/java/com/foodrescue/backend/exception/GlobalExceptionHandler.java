@@ -1,6 +1,7 @@
 package com.foodrescue.backend.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -69,6 +70,15 @@ public class GlobalExceptionHandler {
 
         return build(HttpStatus.NOT_FOUND, "Not Found",
                 "There is no endpoint at this address.", request);
+    }
+
+    /** A signed-in user tried something their role does not allow. */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(
+            AccessDeniedException ex, WebRequest request) {
+
+        return build(HttpStatus.FORBIDDEN, "Forbidden",
+                "You do not have permission to do this.", request);
     }
 
     /** Failed login attempts. */

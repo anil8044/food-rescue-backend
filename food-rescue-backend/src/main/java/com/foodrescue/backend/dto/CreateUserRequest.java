@@ -3,6 +3,7 @@ package com.foodrescue.backend.dto;
 import com.foodrescue.backend.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class CreateUserRequest {
     @NotBlank(message = "Password is required")
     private String password;
 
+    @NotNull(message = "Role is required")
     private Role role;
 
     private String organisationName;

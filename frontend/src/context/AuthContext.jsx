@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { authApi, usersApi } from '../api';
+import { getToken, onUnauthorized, setToken } from '../api/client';
 
 const AuthContext = createContext(null);
 const STORAGE_KEY = 'foodRescueUser';
@@ -7,14 +8,16 @@ const STORAGE_KEY = 'foodRescueUser';
 function loadStoredUser() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    // Without a token the stored user is not a real sign-in (for example left over from an older version).
+    return raw && getToken() ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 }
 
-// NOTE: the backend has no tokens yet. The logged-in user is kept in localStorage
-// so the UI can show the right screens for their role. This is NOT real security.
+// The backend returns a signed token at login. The token is sent with every request and is
+// what the server checks. The stored user only decides which screens the UI shows; the
+// server enforces the permissions.
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(loadStoredUser);
 
@@ -26,9 +29,10 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (email, password) => {
-      const loggedIn = await authApi.login(email, password);
-      saveUser(loggedIn);
-      return loggedIn;
+      const result = await authApi.login(email, password);
+      setToken(result.token);
+      saveUser(result.user);
+      return result.user;
     },
     [saveUser]
   );
@@ -41,7 +45,15 @@ export function AuthProvider({ children }) {
     [login]
   );
 
-  const logout = useCallback(() => saveUser(null), [saveUser]);
+  const logout = useCallback(() => {
+    setToken(null);
+    saveUser(null);
+  }, [saveUser]);
+
+  // If the server rejects the token (expired, or the account was suspended), sign out.
+  useEffect(() => {
+    onUnauthorized(() => saveUser(null));
+  }, [saveUser]);
 
   const userId = user?.id;
   // Re-reads the user from the server, e.g. after an admin approves a recipient org.
